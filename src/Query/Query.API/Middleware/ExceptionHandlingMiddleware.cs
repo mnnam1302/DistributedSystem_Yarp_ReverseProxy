@@ -1,6 +1,11 @@
-﻿using DistributedSystem.Domain.Exceptions;
+﻿
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.SignalR;
+using Query.Domain.Exceptions;
+using System.Reflection;
 using System.Text.Json;
-namespace DistributedSystem.API.Middleware
+
+namespace Query.API.Middleware
 {
     internal sealed class ExceptionHandlingMiddleware : IMiddleware
     {
@@ -15,10 +20,9 @@ namespace DistributedSystem.API.Middleware
         {
             try
             {
-                // Nếu trong next() có lỗi thì ngoài catch sẽ bắt được và nó sẽ handle cái lỗi
                 await next(context);
-            } 
-            catch (Exception ex)
+            }
+            catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
 
@@ -28,7 +32,7 @@ namespace DistributedSystem.API.Middleware
 
         private static async Task HandleExceptionAsync(HttpContext httpContext, Exception exception)
         {
-            var statusCode = GetStatusCode(exception);
+            int statusCode = GetStatusCode(exception);
 
             var response = new
             {
@@ -41,31 +45,22 @@ namespace DistributedSystem.API.Middleware
             httpContext.Response.ContentType = "application/json";
 
             httpContext.Response.StatusCode = statusCode;
-            
+
             await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
 
         private static int GetStatusCode(Exception exception) =>
             exception switch
             {
+                EventException.EventNotFoundException => StatusCodes.Status404NotFound,
 
-                // Những exception mà mình tự định nghĩa
-                // Ví dụ BadRequest trả về 400
-                // Dùng if else ở đây nó không hay, dùng switch nó clean hơn
+                ProductException.ProductNotFoundException => StatusCodes.Status404NotFound,
 
-                // Trường hợp throw ở domain => Domain driven design
-                IdentityException.TokenException => StatusCodes.Status401Unauthorized,
-                ProductException.ProductFieldException => StatusCodes.Status406NotAcceptable, // Should be remove later
-                
-                BadRequestException => StatusCodes.Status400BadRequest,
                 NotFoundException => StatusCodes.Status404NotFound,
-                //Application.Exceptions.ValidationException => StatusCodes.Status422UnprocessableEntity,
-                //FluentValidation.ValidationException => StatusCodes.Status400BadRequest,
-                FormatException => StatusCodes.Status422UnprocessableEntity,
-                // Tường hợp mặc định, nếu không có th nào map ở trên thì trả về 500
+                BadRequestException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
-
+        
         private static string GetTitle(Exception exception) =>
             exception switch
             {
@@ -73,11 +68,25 @@ namespace DistributedSystem.API.Middleware
                 _ => "Server error"
             };
 
-        private static IReadOnlyCollection<DistributedSystem.Application.Exceptions.ValidationError> GetErrors(Exception exception)
-        {
-            IReadOnlyCollection<DistributedSystem.Application.Exceptions.ValidationError> errors = null;
+        // Note: validationException usually side Command more Query
+        // Canbe implement this if want to use Error at Contract
+        //private static IReadOnlyCollection<DistributedSystem.Contract.Abstractions.Shared.Error> GetErrors(Exception exception)
+        //{
+        //    IReadOnlyCollection<DistributedSystem.Contract.Abstractions.Shared.Error> errors = null;
 
-            if (exception is DistributedSystem.Application.Exceptions.ValidationException validationException)
+        //    if (exception is Query.Application.Exceptions.ValidationException validationException)
+        //    {
+        //        errors = validationException.Errors;
+        //    }
+
+        //    return errors;
+        //}
+
+        private static IReadOnlyCollection<Query.Application.Exceptions.ValidationError> GetErrors(Exception exception)
+        {
+            IReadOnlyCollection<Query.Application.Exceptions.ValidationError> errors = null;
+
+            if (exception is Query.Application.Exceptions.ValidationException validationException)
             {
                 errors = validationException.Errors;
             }

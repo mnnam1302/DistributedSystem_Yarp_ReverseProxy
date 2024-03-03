@@ -1,53 +1,37 @@
-﻿using DistributedSystem.Application.Abstractions;
-using DistributedSystem.Contract.JsonConverters;
-using DistributedSystem.Infrastructure.Authentication;
-using DistributedSystem.Infrastructure.BackgroundJobs;
-using DistributedSystem.Infrastructure.Caching;
-using DistributedSystem.Infrastructure.DependencyInjection.Options;
-using DistributedSystem.Infrastructure.PipelineObservers;
+﻿using DistributedSystem.Contract.JsonConverters;
 using MassTransit;
-using MassTransit.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Quartz;
-using System.ComponentModel;
-using System.Net.NetworkInformation;
+using Query.Domain.Abstractions.Options;
+using Query.Infrastructure.DependencyInjection.Options;
+using Query.Infrastructure.PipelineObservers;
 using System.Reflection;
 
-namespace DistributedSystem.Infrastructure.DependencyInjection.Extensions
+namespace Query.Infrastructure.DependencyInjection.Extensions
 {
-    public static class ServiceCollectionExtensions
+    public static class ServiceCollectionExtension
     {
-        public static void AddServicesInfrastructure(this IServiceCollection services)
+        public static void AddServicesInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<IJwtTokenService, JwtTokenService>();
-            services.AddTransient<ICacheService, CacheService>();
+            services.Configure<MongoDbSettings>(
+                configuration.GetSection(nameof(MongoDbSettings)));
+
+            services.AddSingleton<IMongoDbSettings>(serviceProvider =>
+                serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value);
         }
 
-        public static void AddRedisInfrastructure(this IServiceCollection services, IConfiguration configuration)
-        {
-            // Nếu mình không cấu hình AddStackExchangeRedisCache thì sẽ sử dụng MemoryCache
-            services.AddStackExchangeRedisCache(redisOptions =>
-            {
-                var connectionString = configuration.GetConnectionString("Redis");
-                redisOptions.Configuration = connectionString;
-            });
-        }
-
-        // Configure MassTransit with RabbitMQ
         public static IServiceCollection AddMasstransitRabbitMQInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             var massTransitConfiguration = new MasstransitConfiguration();
             configuration.GetSection(nameof(MasstransitConfiguration)).Bind(massTransitConfiguration);
 
             var messageBusOptions = new MesssageBusOptions();
-            configuration.GetSection(nameof(MesssageBusOptions)).Bind(messageBusOptions);
+            configuration.GetSection(nameof(messageBusOptions)).Bind(messageBusOptions);
 
             services.AddMassTransit(cfg =>
             {
-                // =================== Setup for Consumer ===================
                 cfg.AddConsumers(Assembly.GetExecutingAssembly()); // Add all consumer to masstransit instead of above command
 
                 // ?? => Configure endpoint formatter. Not configure for producer Root Exchange
@@ -124,40 +108,6 @@ namespace DistributedSystem.Infrastructure.DependencyInjection.Extensions
             });
 
             return services;
-        }
-
-        // Configure Job
-        public static void AddQuartzInfrastructure(this IServiceCollection services)
-        {
-            services.AddQuartz(configure =>
-            {
-                var jobKey = new JobKey(nameof(ProducerOutboxMessageJob));
-
-                // Add job and trigger for this job
-                // Mục đích: mỗi lần mình sẽ Push 20 message lên RabbitMQ
-                configure
-                    .AddJob<ProducerOutboxMessageJob>(jobKey)
-                    .AddTrigger(trigger =>
-                    {
-                        trigger.ForJob(jobKey)
-                        .WithSimpleSchedule(schedule =>
-                        {
-                            // Check lại Milisecond hay Microsecond - Trandong
-                            schedule.WithInterval(TimeSpan.FromMilliseconds(100));
-                            schedule.RepeatForever();
-                        });
-                    });
-
-                configure.UseMicrosoftDependencyInjectionJobFactory();
-            });
-
-            services.AddQuartzHostedService();
-        }
-
-        public static void AddMediatRInfrastructure(this IServiceCollection services)
-        {
-            // Tại sao ở đây lại có thêm Validator => MesssageBusOptions có các ràng buộc
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(AssemblyReference.Assembly));
         }
     }
 }
