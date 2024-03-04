@@ -36,10 +36,15 @@ namespace Query.Application.UseCases.V1.Commands.Product
 
         public async Task<Result> Handle(DomainEvent.ProductUpdated request, CancellationToken cancellationToken)
         {
-            var productProjection = await _productRepository.FindOneAsync(p => p.DocumentId == request.Id)
+            var product = await _productRepository.FindOneAsync(p => p.DocumentId == request.Id)
                 ?? throw new ProductException.ProductNotFoundException(request.Id);
 
-            await _productRepository.ReplaceOneAsync(productProjection);
+            product.Name = request.Name;
+            product.Description = request.Description;
+            product.Price = request.Price;
+            product.ModifiedOnUtc = DateTime.UtcNow;
+
+            await _productRepository.ReplaceOneAsync(product);
 
             return Result.Success();
         }

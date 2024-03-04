@@ -4,11 +4,6 @@ using DistributedSystem.Contract.Services.V1.Product;
 using Query.Domain.Abstractions.Repositories;
 using Query.Domain.Entities;
 using Query.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Query.Application.UseCases.V1.Queries.Product
 {
