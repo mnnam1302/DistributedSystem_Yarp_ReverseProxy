@@ -47,7 +47,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Query.Infrastructure", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Query.Presentation", "src\Query\Query.Presentation\Query.Presentation.csproj", "{DE3F439F-716E-4A0D-A016-F7751B6DC9D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReverseProxy", "src\ReverseProxy\ReverseProxy\ReverseProxy.csproj", "{8F4F8D39-C9AE-45C1-B5B9-F1541CA14E1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "src\ReverseProxy\ApiGateway\ApiGateway.csproj", "{9D746F5A-97EC-4BAB-AFC7-731308EF4CAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,10 +107,10 @@ Global
 		{DE3F439F-716E-4A0D-A016-F7751B6DC9D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE3F439F-716E-4A0D-A016-F7751B6DC9D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE3F439F-716E-4A0D-A016-F7751B6DC9D0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F4F8D39-C9AE-45C1-B5B9-F1541CA14E1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F4F8D39-C9AE-45C1-B5B9-F1541CA14E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F4F8D39-C9AE-45C1-B5B9-F1541CA14E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F4F8D39-C9AE-45C1-B5B9-F1541CA14E1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D746F5A-97EC-4BAB-AFC7-731308EF4CAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D746F5A-97EC-4BAB-AFC7-731308EF4CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D746F5A-97EC-4BAB-AFC7-731308EF4CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D746F5A-97EC-4BAB-AFC7-731308EF4CAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -133,7 +133,7 @@ Global
 		{0BD7734D-8EF4-4167-ACE6-EE6B2E39811D} = {E2C82E03-A2A2-44BD-B9AE-C5CCF80AECD0}
 		{CD3840CC-72E5-493E-9957-1ECEFB9DF41A} = {E2C82E03-A2A2-44BD-B9AE-C5CCF80AECD0}
 		{DE3F439F-716E-4A0D-A016-F7751B6DC9D0} = {E2C82E03-A2A2-44BD-B9AE-C5CCF80AECD0}
-		{8F4F8D39-C9AE-45C1-B5B9-F1541CA14E1D} = {A4829E21-2652-4B60-9A25-42C1E19B606A}
+		{9D746F5A-97EC-4BAB-AFC7-731308EF4CAC} = {A4829E21-2652-4B60-9A25-42C1E19B606A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A454EAD-E420-4229-A2B9-2D2817FC2461}
