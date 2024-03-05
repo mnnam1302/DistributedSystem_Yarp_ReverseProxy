@@ -2,7 +2,7 @@
 
 namespace Authorization.Domain.Abstractions.Repositories
 {
-    public interface IRepositoryBase<TEntity, TKey>
+    public interface IRepositoryBase<TEntity, in TKey>
         where TEntity : class
     {
         Task<TEntity> FindByIdAsync(TKey id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);

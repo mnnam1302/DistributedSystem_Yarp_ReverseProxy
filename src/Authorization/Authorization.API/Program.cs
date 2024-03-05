@@ -1,4 +1,5 @@
 using Authorization.API.DependencyInjection.Extensions;
+using Authorization.Persistence.DependencyInjection.Extensions;
 using Authorization.API.Middleware;
 using Carter;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
@@ -37,6 +38,12 @@ builder.Services
         options.GroupNameFormat = "'v'VVV";
         options.SubstituteApiVersionInUrl = true;
     });
+
+
+builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection("SqlServerRetryOptions"));
+builder.Services.AddSqlPersistence(builder.Configuration);
+builder.Services.AddRepositoryPersistence();
+
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
