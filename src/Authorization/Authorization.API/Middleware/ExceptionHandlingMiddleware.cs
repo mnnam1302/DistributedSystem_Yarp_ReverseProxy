@@ -48,6 +48,8 @@ namespace Authorization.API.Middleware
         private static int GetStatusCode(Exception exception) =>
             exception switch
             {
+                IdentityException.TokenException => StatusCodes.Status401Unauthorized,
+
                 NotFoundException => StatusCodes.Status404NotFound,
                 BadRequestException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
