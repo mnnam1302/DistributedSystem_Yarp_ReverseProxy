@@ -18,7 +18,7 @@ namespace Authorization.Infrastructure.Authentication
             configuration.GetSection(nameof(JwtOptions)).Bind(jwtOptions);
         }
 
-        public string GenerateToken(List<Claim> claims)
+        public string GenerateAccessToken(List<Claim> claims)
         {
             var screteKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey));
             var signatureCredentials = new SigningCredentials(screteKey, SecurityAlgorithms.HmacSha256);

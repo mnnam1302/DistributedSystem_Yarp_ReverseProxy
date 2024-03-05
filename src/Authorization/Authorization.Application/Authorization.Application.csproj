@@ -14,6 +14,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\DistributedSystem.Application\DistributedSystem.Application.csproj" />
+    <ProjectReference Include="..\Authorization.Domain\Authorization.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UseCases\V1\Commands\" />
   </ItemGroup>
 
 </Project>

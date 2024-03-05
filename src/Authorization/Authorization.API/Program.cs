@@ -5,6 +5,7 @@ using Carter;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Serilog;
 using Authorization.Infrastructure.DependecyInjection.Extensions;
+using Authorization.Application.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,8 @@ builder.Services
         options.SubstituteApiVersionInUrl = true;
     });
 
+builder.Services.AddMediatRApplication();
+builder.Services.AddAutoMapperApplication();
 
 builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection("SqlServerRetryOptions"));
 builder.Services.AddSqlPersistence(builder.Configuration);
