@@ -1,6 +1,6 @@
 ﻿namespace Authorization.Domain.Abstractions
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IAsyncDisposable
     {
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
     }

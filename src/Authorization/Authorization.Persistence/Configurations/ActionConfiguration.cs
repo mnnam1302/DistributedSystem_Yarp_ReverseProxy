@@ -1,0 +1,36 @@
+﻿using Authorization.Persistence.Constants;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Action = Authorization.Domain.Entities.Action;
+
+namespace Authorization.Persistence.Configurations
+{
+    internal sealed class ActionConfiguration : IEntityTypeConfiguration<Action>
+    {
+        public void Configure(EntityTypeBuilder<Action> builder)
+        {
+            builder.ToTable(TableNames.Actions);
+
+            builder.HasKey(x => x.Id);
+
+            builder.Property(x => x.Id).HasMaxLength(50);
+            builder.Property(x => x.Name).HasMaxLength(200).IsRequired(true);
+            builder.Property(x => x.IsActive).HasDefaultValue(true);
+            builder.Property(x => x.SortOrder).HasDefaultValue(null);
+
+            // Each User can have many Permissions
+            // 1 - n
+            builder.HasMany(e => e.Permissions)
+                .WithOne()
+                .HasForeignKey(p => p.ActionId)
+                .IsRequired();
+
+            // Each User can have many ActionInFunctions
+            // 1 - n relationship (1 because IsRequired)
+            builder.HasMany(e => e.ActionInFunctions)
+                .WithOne()
+                .HasForeignKey(aif => aif.ActionId)
+                .IsRequired();
+        }
+    }
+}
