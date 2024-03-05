@@ -4,6 +4,7 @@ using Authorization.API.Middleware;
 using Carter;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Serilog;
+using Authorization.Infrastructure.DependecyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,9 @@ builder.Services
 builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection("SqlServerRetryOptions"));
 builder.Services.AddSqlPersistence(builder.Configuration);
 builder.Services.AddRepositoryPersistence();
+
+
+builder.Services.AddServicesInfrastructure();
 
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
