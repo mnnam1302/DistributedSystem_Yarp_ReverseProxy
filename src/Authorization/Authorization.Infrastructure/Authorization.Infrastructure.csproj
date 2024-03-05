@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Authorization.Application\Authorization.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DependecyInjection\Extensions\" />
+  </ItemGroup>
+
 </Project>
