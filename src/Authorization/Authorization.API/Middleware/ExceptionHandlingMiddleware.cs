@@ -50,6 +50,9 @@ namespace Authorization.API.Middleware
             {
                 IdentityException.TokenException => StatusCodes.Status401Unauthorized,
 
+                AppUserException.UserNotFoundByEmailException => StatusCodes.Status404NotFound,
+                AppUserException.UserFieldException => StatusCodes.Status404NotFound,
+
                 NotFoundException => StatusCodes.Status404NotFound,
                 BadRequestException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError

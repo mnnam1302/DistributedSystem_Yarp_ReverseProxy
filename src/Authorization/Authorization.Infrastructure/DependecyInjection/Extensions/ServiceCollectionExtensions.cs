@@ -1,6 +1,7 @@
 ﻿using Authorization.Application.Abstractions;
 using Authorization.Infrastructure.Authentication;
 using Authorization.Infrastructure.Caching;
+using Authorization.Infrastructure.HashPassword;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,7 @@ namespace Authorization.Infrastructure.DependecyInjection.Extensions
         {
             services.AddTransient<IJwtTokenService, JwtTokenService>();
             services.AddTransient<ICacheService, CacheService>();
+            services.AddTransient<IHashPasswordService, HashPasswordService>();
         }
 
         public static void AddRedisInfrastructure(this IServiceCollection services, IConfiguration configuration)
