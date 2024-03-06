@@ -9,10 +9,12 @@ namespace Authorization.Application.UseCases.V1.Queries
     public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.Authenticated>
     {
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly ICacheService _cacheService;
 
-        public GetLoginQueryHandler(IJwtTokenService jwtTokenService)
+        public GetLoginQueryHandler(IJwtTokenService jwtTokenService, ICacheService cacheService)
         {
             _jwtTokenService = jwtTokenService;
+            _cacheService = cacheService;
         }
 
         public async Task<Result<Response.Authenticated>> Handle(Query.GetLoginQuery request, CancellationToken cancellationToken)
@@ -22,7 +24,7 @@ namespace Authorization.Application.UseCases.V1.Queries
             // Get User's claims
             var claims = new List<Claim>
             {
-                new(ClaimTypes.Name, "Nam"),
+                new(ClaimTypes.Name, "Nhat Nam"),
                 new(ClaimTypes.Email, request.Email),
                 new(ClaimTypes.Role, "Junior .NET")
             };
@@ -37,6 +39,8 @@ namespace Authorization.Application.UseCases.V1.Queries
                 RefreshToken = refreshToken,
                 RefreshTokenExpiryTime = DateTime.Now.AddMinutes(5)
             };
+
+            await _cacheService.SetAsync(request.Email, result, cancellationToken);
 
             return Result.Success(result);
         }

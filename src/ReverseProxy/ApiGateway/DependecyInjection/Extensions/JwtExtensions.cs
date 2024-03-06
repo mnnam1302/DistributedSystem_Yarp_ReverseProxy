@@ -52,10 +52,11 @@ namespace ApiGateway.DependecyInjection.Extensions
             {
                 options.AddPolicy("authPolicy", policy =>
                 {
-                    // User hanve to login to pass Validate above
                     policy.RequireAuthenticatedUser();
                 });
             });
+
+            //services.AddAuthorization();
 
             //services.AddScoped<CustomJwtBearerEvents>()
         }

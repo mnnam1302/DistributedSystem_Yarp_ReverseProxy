@@ -41,6 +41,8 @@ builder.Services
         options.SubstituteApiVersionInUrl = true;
     });
 
+//builder.Services.AddJwtAuthenticationAPI(builder.Configuration); => VALIDATION AT SERVER ApiGateway
+
 builder.Services.AddMediatRApplication();
 builder.Services.AddAutoMapperApplication();
 
@@ -50,6 +52,7 @@ builder.Services.AddRepositoryPersistence();
 
 
 builder.Services.AddServicesInfrastructure();
+builder.Services.AddRedisInfrastructure(builder.Configuration);
 
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
@@ -65,6 +68,24 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwaggerAPI();
 
 //app.UseHttpsRedirection();
+
+// Should add Authentication and Authorization herre. Let's check again
+//app.UseAuthentication();
 //app.UseAuthorization();
 
-app.Run();
+try
+{
+    await app.RunAsync();
+    Log.Information("Stop cleanly");
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "An unhandled exception occured during bootstrapping");
+}
+finally
+{
+    Log.CloseAndFlush();
+    await app.DisposeAsync();
+}
+
+public partial class Program { }
