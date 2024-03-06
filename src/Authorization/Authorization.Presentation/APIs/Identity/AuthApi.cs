@@ -1,7 +1,9 @@
 ﻿using Authorization.Presentation.Abstractions;
 using Carter;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Authorization.Presentation.APIs.Identity
@@ -17,15 +19,21 @@ namespace Authorization.Presentation.APIs.Identity
 
             group1.MapPost("login", AuthenticationV1);
 
-            var group2 = app.NewVersionedApi("authentication")
-                .MapGroup(BaseUrl).HasApiVersion(2);
 
-            group2.MapPost("login", () => "");
+            //var group2 = app.NewVersionedApi("authentication")
+            //    .MapGroup(BaseUrl).HasApiVersion(2);
+
+            //group2.MapPost("login", () => "");
         }
 
-        private static IResult AuthenticationV1()
+        private static async Task<IResult> AuthenticationV1(ISender sender, [FromBody] DistributedSystem.Contract.Services.V1.Identity.Query.GetLoginQuery login)
         {
-            return Results.Ok();
+            var result = await sender.Send(login);
+
+            if (result.IsFailure)
+                return HandlerFailure(result);
+
+            return Results.Ok(result);
         }
     }
 }

@@ -14,4 +14,8 @@
     <Folder Include="DependecyInjection\Extensions\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.16" />
+  </ItemGroup>
+
 </Project>

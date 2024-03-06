@@ -4,7 +4,7 @@ namespace Authorization.Application.Abstractions
 {
     public interface IJwtTokenService
     {
-        string GenerateToken(List<Claim> claims);
+        string GenerateAccessToken(IEnumerable<Claim> claims);
 
         string GenerateRefreshToken();
 

@@ -52,7 +52,7 @@ builder.Services
     });
 
 // Add Jwt Authentication => After, app.UseAuthentication(); app.UseAuthorization();
-builder.Services.AddJwtAuthenticationAPI(builder.Configuration);
+//builder.Services.AddJwtAuthenticationAPI(builder.Configuration); => VALIDATION AT SERVER ApiGateway
 
 
 builder.Services.AddMediatRApplication();
@@ -86,8 +86,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 //app.UseHttpsRedirection(); // => Use in case for production
 
-app.UseAuthentication(); // This to need added before UseAuthorization
-app.UseAuthorization();
+//app.UseAuthentication(); // This to need added before UseAuthorization
+//app.UseAuthorization();
 
 //app.MapControllers(); // Use in case Controller API
 
