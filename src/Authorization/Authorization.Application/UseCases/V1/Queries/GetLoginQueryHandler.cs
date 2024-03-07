@@ -10,16 +10,31 @@ namespace Authorization.Application.UseCases.V1.Queries
     {
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ICacheService _cacheService;
+        private readonly IHashPasswordService _hashPasswordService;
 
-        public GetLoginQueryHandler(IJwtTokenService jwtTokenService, ICacheService cacheService)
+        public GetLoginQueryHandler(
+            IJwtTokenService jwtTokenService, 
+            ICacheService cacheService, 
+            IHashPasswordService hashPasswordService)
         {
             _jwtTokenService = jwtTokenService;
             _cacheService = cacheService;
+            _hashPasswordService = hashPasswordService;
         }
 
         public async Task<Result<Response.Authenticated>> Handle(Query.GetLoginQuery request, CancellationToken cancellationToken)
         {
             // Check Email and Password
+
+            // Step 1: Get User by Email => Get salt && hash password in DB
+
+            // test
+            // Hash password use in case user register => Result: string hashPassword && salt
+            // Assume, Register
+            var hashPasswordDB = _hashPasswordService.HashPassword(request.Password, out string salt);
+
+            // Step 2: Verify Password
+            var isPasswordValid = _hashPasswordService.VerifyPassword(request.Password, hashPasswordDB, salt);
 
             // Get User's claims
             var claims = new List<Claim>
