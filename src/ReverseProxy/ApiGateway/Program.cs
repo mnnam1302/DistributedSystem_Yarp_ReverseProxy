@@ -8,6 +8,10 @@ builder.Services.AddJwtAuthenticationApiGateway(builder.Configuration);
 
 builder.Services.AddYarpReverseProxyApiGateway(builder.Configuration);
 
+builder.Services.AddServicesApiGateway();
+
+builder.Services.AddRedisApiGateway(builder.Configuration);
+
 var app = builder.Build();
 
 
