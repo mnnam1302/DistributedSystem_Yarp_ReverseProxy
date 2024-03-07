@@ -1,4 +1,5 @@
-﻿using ApiGateway.DependecyInjection.Options;
+﻿using ApiGateway.Attributes;
+using ApiGateway.DependecyInjection.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -45,7 +46,7 @@ namespace ApiGateway.DependecyInjection.Extensions
                     }
                 };
 
-                //options.EventsType = typeof(CustomJwtBearerEvents);
+                options.EventsType = typeof(CustomJwtBearerEvents);
             });
 
             services.AddAuthorization(options =>
@@ -56,9 +57,7 @@ namespace ApiGateway.DependecyInjection.Extensions
                 });
             });
 
-            //services.AddAuthorization();
-
-            //services.AddScoped<CustomJwtBearerEvents>()
+            services.AddScoped<CustomJwtBearerEvents>();
         }
     }
 }
