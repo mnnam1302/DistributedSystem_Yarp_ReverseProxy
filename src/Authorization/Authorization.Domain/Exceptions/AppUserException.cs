@@ -2,10 +2,17 @@
 {
     public static class AppUserException
     {
-        public class UserNotFoundByEmailException : NotFoundException
+        public class UserNotFoundByFieldException : NotFoundException
         {
-            public UserNotFoundByEmailException(string email)
-                : base($"User with email: {email} not found")
+            public UserNotFoundByFieldException(string userField)
+                : base($"User with field {userField} is not found")
+            {
+            }
+        }
+        public class UserExistingException : BadRequestException
+        {
+            public UserExistingException(string userField, string value) 
+                : base($"The user with field {userField}: {value} is already existing.")
             {
             }
         }
@@ -17,5 +24,6 @@
             {
             }
         }
+
     }
 }

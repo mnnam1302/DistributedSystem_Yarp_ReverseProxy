@@ -13,6 +13,7 @@ namespace Authorization.Persistence.Configurations
 
             builder.HasKey(x => x.Id);
 
+            builder.Property(x => x.Salt).HasMaxLength(255).IsRequired();
             builder.Property(x => x.IsDirector).HasDefaultValue(false);
             builder.Property(x => x.IsHeadOfDepartment).HasDefaultValue(false);
             builder.Property(x => x.ManagerId).HasDefaultValue(null);

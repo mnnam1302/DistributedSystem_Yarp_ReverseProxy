@@ -1,22 +1,26 @@
-﻿using System.Linq.Expressions;
+﻿using Authorization.Domain.Abstractions.Entities;
+using System.Linq.Expressions;
 
 namespace Authorization.Domain.Abstractions.Repositories
 {
-    public interface IRepositoryBase<TEntity, in TKey>
-        where TEntity : class
+    public interface IRepositoryBase<IEntity, in TKey>
+        where IEntity : class
     {
-        Task<TEntity> FindByIdAsync(TKey id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);
+        Task<IEntity> FindByIdAsync(TKey id, CancellationToken cancellationToken = default, 
+            params Expression<Func<IEntity, object>>[] includeProperties);
 
-        Task<TEntity> FindSingleAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);
+        Task<IEntity> FindSingleAsync(Expression<Func<IEntity, bool>>? predicate = null, CancellationToken cancellationToken = default, 
+            params Expression<Func<IEntity, object>>[] includeProperties);
 
-        IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includeProperties);
+        IQueryable<IEntity> FindAll(Expression<Func<IEntity, bool>>? predicate = null, 
+            params Expression<Func<IEntity, object>>[] includeProperties);
 
-        void Add(TEntity entity);
+        void Add(IEntity entity);
 
-        void Update(TEntity entity);
+        void Update(IEntity entity);
 
-        void Remove(TEntity entity);
+        void Remove(IEntity entity);
 
-        void RemoveMultiple(List<TEntity> entities);
+        void RemoveMultiple(List<IEntity> entities);
     }
 }

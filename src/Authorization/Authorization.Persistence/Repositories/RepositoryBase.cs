@@ -1,8 +1,7 @@
-﻿using Authorization.Domain.Abstractions.Repositories;
+﻿using Authorization.Domain.Abstractions.Entities;
+using Authorization.Domain.Abstractions.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Linq;
-using Authorization.Domain.Abstractions.Entities;
 
 namespace Authorization.Persistence.Repositories
 {
@@ -23,7 +22,7 @@ namespace Authorization.Persistence.Repositories
 
         public IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includeProperties)
         {
-            IQueryable<TEntity> items = _dbContext.Set<TEntity>().AsNoTracking(); 
+            IQueryable<TEntity> items = _dbContext.Set<TEntity>().AsNoTracking();
             // Important to use AsNoTracking to improve performance - Always include AsNoTracking for Query Side
 
             if (includeProperties != null)
@@ -40,7 +39,6 @@ namespace Authorization.Persistence.Repositories
             return items;
         }
 
-        // Make to Flexible here
         public async Task<TEntity> FindByIdAsync(TKey id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties)
         {
             return await FindAll(null, includeProperties)

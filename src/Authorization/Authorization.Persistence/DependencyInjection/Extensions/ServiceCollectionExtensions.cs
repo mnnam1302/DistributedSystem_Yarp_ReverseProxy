@@ -90,6 +90,9 @@ namespace Authorization.Persistence.DependencyInjection.Extensions
         {
             services.AddTransient(typeof(IUnitOfWork), typeof(EFUnitOfWork));
             services.AddTransient(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
+
+            // Test
+            services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
         }
 
         public static OptionsBuilder<SqlServerRetryOptions> ConfigureSqlServerRetryOptionsPersistence(this IServiceCollection services, IConfiguration section)

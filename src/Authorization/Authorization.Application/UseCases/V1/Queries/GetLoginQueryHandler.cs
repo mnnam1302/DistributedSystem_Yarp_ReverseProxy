@@ -1,4 +1,6 @@
 ﻿using Authorization.Application.Abstractions;
+using Authorization.Domain.Abstractions.Repositories;
+using Authorization.Domain.Exceptions;
 using DistributedSystem.Contract.Abstractions.Message;
 using DistributedSystem.Contract.Abstractions.Shared;
 using DistributedSystem.Contract.Services.V1.Identity;
@@ -11,36 +13,45 @@ namespace Authorization.Application.UseCases.V1.Queries
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ICacheService _cacheService;
         private readonly IHashPasswordService _hashPasswordService;
+        private readonly IUserRepository _userRepository;
 
         public GetLoginQueryHandler(
             IJwtTokenService jwtTokenService, 
             ICacheService cacheService, 
-            IHashPasswordService hashPasswordService)
+            IHashPasswordService hashPasswordService,
+            IUserRepository userRepository)
         {
             _jwtTokenService = jwtTokenService;
             _cacheService = cacheService;
             _hashPasswordService = hashPasswordService;
+            _userRepository = userRepository;
         }
 
+        /// <summary>
+        /// 1. Get user by email
+        /// 2. Using salt to hash password to compare with password in database
+        /// 3. Get user claims
+        /// 4. Generate access token and refresh token
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<Result<Response.Authenticated>> Handle(Query.GetLoginQuery request, CancellationToken cancellationToken)
         {
-            // Check Email and Password
+            var user = await _userRepository.FindSingleUserAsync(x => x.Email == request.Email, cancellationToken);
 
-            // Step 1: Get User by Email => Get salt && hash password in DB
+            if (user is null)
+                throw new AppUserException.UserFieldException(nameof(request.Email));
 
-            // test
-            // Hash password use in case user register => Result: string hashPassword && salt
-            // Assume, Register
-            var hashPasswordDB = _hashPasswordService.HashPassword(request.Password, out string salt);
+            var isPasswordValid = _hashPasswordService.VerifyPassword(request.Password, user.PasswordHash, user.Salt);
 
-            // Step 2: Verify Password
-            var isPasswordValid = _hashPasswordService.VerifyPassword(request.Password, hashPasswordDB, salt);
+            if (!isPasswordValid)
+                throw new AppUserException.UserFieldException(nameof(request.Password));
 
-            // Get User's claims
             var claims = new List<Claim>
             {
-                new(ClaimTypes.Name, "Nhat Nam"),
-                new(ClaimTypes.Email, request.Email),
+                new(ClaimTypes.Name, user.Email),
+                new(ClaimTypes.Email, user.Email),
                 new(ClaimTypes.Role, "Junior .NET")
             };
 
