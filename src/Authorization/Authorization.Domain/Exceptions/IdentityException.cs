@@ -9,5 +9,13 @@
             {
             }
         }
+
+        public class AuthenticatedException : BadRequestException
+        {
+            public AuthenticatedException()
+                : base("The email or password are incorrect.")
+            {
+            }
+        }
     }
 }

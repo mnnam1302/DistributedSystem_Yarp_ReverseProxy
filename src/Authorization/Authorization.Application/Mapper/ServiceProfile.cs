@@ -2,11 +2,10 @@
 
 namespace Authorization.Application.Mapper
 {
-    public class ProfileService : Profile
+    public class ServiceProfile : Profile
     {
-        public ProfileService()
+        public ServiceProfile()
         {
-            
         }
     }
 }

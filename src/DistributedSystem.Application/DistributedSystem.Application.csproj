@@ -15,6 +15,7 @@
   <ItemGroup>
     <Folder Include="DependencyInjection\Options\" />
     <Folder Include="Exceptions\" />
+    <Folder Include="UseCases\V1\Queries\" />
   </ItemGroup>
 
   <ItemGroup>

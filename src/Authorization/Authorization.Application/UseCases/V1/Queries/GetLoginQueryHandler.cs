@@ -1,5 +1,6 @@
 ﻿using Authorization.Application.Abstractions;
 using Authorization.Domain.Abstractions.Repositories;
+using Authorization.Domain.Entities;
 using Authorization.Domain.Exceptions;
 using DistributedSystem.Contract.Abstractions.Message;
 using DistributedSystem.Contract.Abstractions.Shared;
@@ -12,18 +13,19 @@ namespace Authorization.Application.UseCases.V1.Queries
     {
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ICacheService _cacheService;
-        private readonly IHashPasswordService _hashPasswordService;
-        private readonly IUserRepository _userRepository;
+        private readonly IPasswordHasherService _passwordHasherService;
+        private readonly IRepositoryBase<AppUser, Guid> _userRepository;
 
         public GetLoginQueryHandler(
             IJwtTokenService jwtTokenService, 
-            ICacheService cacheService, 
-            IHashPasswordService hashPasswordService,
-            IUserRepository userRepository)
+            ICacheService cacheService,
+            IPasswordHasherService passwordHasherService,
+            IRepositoryBase<AppUser, Guid> userRepository
+            )
         {
             _jwtTokenService = jwtTokenService;
             _cacheService = cacheService;
-            _hashPasswordService = hashPasswordService;
+            _passwordHasherService = passwordHasherService;
             _userRepository = userRepository;
         }
 
@@ -38,23 +40,25 @@ namespace Authorization.Application.UseCases.V1.Queries
         /// <returns></returns>
         public async Task<Result<Response.Authenticated>> Handle(Query.GetLoginQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.FindSingleUserAsync(x => x.Email == request.Email, cancellationToken);
+            //Check user
+            var user = await _userRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken);
 
             if (user is null)
-                throw new AppUserException.UserFieldException(nameof(request.Email));
+                throw new AppUserException.UserNotFoundByEmailException(request.Email);
 
-            var isPasswordValid = _hashPasswordService.VerifyPassword(request.Password, user.PasswordHash, user.Salt);
+            var isAuthentication = _passwordHasherService.VerifyPassword(request.Password, 
+                                                                            user.PasswordHash, 
+                                                                            user.PasswordSalt);
 
-            if (!isPasswordValid)
-                throw new AppUserException.UserFieldException(nameof(request.Password));
+            if (!isAuthentication)
+                throw new IdentityException.AuthenticatedException();
 
             var claims = new List<Claim>
             {
-                new(ClaimTypes.Name, user.Email),
+                new(ClaimTypes.Name, user.FullName),
                 new(ClaimTypes.Email, user.Email),
                 new(ClaimTypes.Role, "Junior .NET")
             };
-
 
             string accessToken = _jwtTokenService.GenerateAccessToken(claims);
             string refreshToken = _jwtTokenService.GenerateRefreshToken();

@@ -14,11 +14,11 @@ namespace Query.Presentation.APIs
             const string BaseUrl = "/api/v{version:apiVersion}/products";
 
             var group1 = app.NewVersionedApi("products")
-                .MapGroup(BaseUrl).HasApiVersion(1); //.RequireAuthorization();
+                .MapGroup(BaseUrl).HasApiVersion(1);
 
             #region ========= Version 1 =========
 
-            group1.MapGet(string.Empty, GetProductsV1);
+            group1.MapGet(string.Empty, GetProductsV1).AllowAnonymous();
             group1.MapGet("{productId}", GetProductsByIdV1);
 
             #endregion ========= Version 1 =========

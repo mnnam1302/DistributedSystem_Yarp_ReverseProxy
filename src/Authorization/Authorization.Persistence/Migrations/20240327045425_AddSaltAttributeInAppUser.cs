@@ -5,16 +5,19 @@
 namespace Authorization.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class AddSaltFieldInAppUser : Migration
+    public partial class AddSaltAttributeInAppUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
+            migrationBuilder.DropColumn(
                 name: "Salt",
+                table: "AppUsers");
+
+            migrationBuilder.AddColumn<string>(
+                name: "PasswordSalt",
                 table: "AppUsers",
-                type: "nvarchar(255)",
-                maxLength: 255,
+                type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
         }
@@ -23,8 +26,16 @@ namespace Authorization.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Salt",
+                name: "PasswordSalt",
                 table: "AppUsers");
+
+            migrationBuilder.AddColumn<string>(
+                name: "Salt",
+                table: "AppUsers",
+                type: "nvarchar(255)",
+                maxLength: 255,
+                nullable: false,
+                defaultValue: "");
         }
     }
 }

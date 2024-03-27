@@ -1,6 +1,5 @@
 ﻿using DistributedSystem.Domain.Abstractions;
 using DistributedSystem.Domain.Abstractions.Repositories;
-using DistributedSystem.Domain.Entities.Identity;
 using DistributedSystem.Persistence.DependencyInjection.Options;
 using DistributedSystem.Persistence.Interceptors;
 using DistributedSystem.Persistence.Repositories;
@@ -64,34 +63,6 @@ namespace DistributedSystem.Persistence.DependencyInjection.Extensions
                 //            .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name));
 
                 #endregion ============== SQL-SERVER-STRATEGY-2 ==============
-            });
-
-            // Cấu hình cho Identity
-            services.AddIdentityCore<AppUser>(opt =>
-            {
-                // Default true - khóa tài khoản có được phép đối với người dùng mới hay không.
-                opt.Lockout.AllowedForNewUsers = true; 
-                // Default 2 minutes - tài khoản sẽ bị khóa sau một số lần đăng nhập không thành công.
-                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
-                // Default 5 -  có thể thử đăng nhập không thành công trước khi tài khoản của họ bị khóa.
-                opt.Lockout.MaxFailedAccessAttempts = 3; 
-            })
-                .AddRoles<AppRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            // Cấu hình cho password
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.Lockout.AllowedForNewUsers = true;
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
-                options.Lockout.MaxFailedAccessAttempts = 3;
-                options.Password.RequireDigit = false; // Chữ số 0...9
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false; // Yêu cầu ít nhất một ký tự đặc biệt
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 6;
-                options.Password.RequiredUniqueChars = 1; // Số lượng ký tự - mật khẩu cần phải bao gồm ít nhất một ký tự độc nhất.
-                options.Lockout.AllowedForNewUsers = true;
             });
         }
 
