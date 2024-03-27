@@ -160,6 +160,10 @@ namespace Authorization.Persistence.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -168,11 +172,6 @@ namespace Authorization.Persistence.Migrations
 
                     b.Property<Guid>("PositionId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Salt")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");

@@ -3,45 +3,44 @@ using Authorization.Persistence.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Authorization.Persistence.Configurations
+namespace Authorization.Persistence.Configurations;
+
+internal sealed class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
 {
-    internal sealed class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
+    public void Configure(EntityTypeBuilder<AppUser> builder)
     {
-        public void Configure(EntityTypeBuilder<AppUser> builder)
-        {
-            builder.ToTable(TableNames.AppUsers);
+        builder.ToTable(TableNames.AppUsers);
 
-            builder.HasKey(x => x.Id);
+        builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Salt).HasMaxLength(255).IsRequired();
-            builder.Property(x => x.IsDirector).HasDefaultValue(false);
-            builder.Property(x => x.IsHeadOfDepartment).HasDefaultValue(false);
-            builder.Property(x => x.ManagerId).HasDefaultValue(null);
-            builder.Property(x => x.IsReceipient).HasDefaultValue(-1);
+        builder.Property(x => x.IsDirector).HasDefaultValue(false);
+        builder.Property(x => x.IsHeadOfDepartment).HasDefaultValue(false);
+        builder.Property(x => x.ManagerId).HasDefaultValue(null);
+        builder.Property(x => x.IsReceipient).HasDefaultValue(-1);
+        builder.Property(x => x.PasswordSalt).IsRequired();
 
-            // Each User can have many UserClaims
-            builder.HasMany(e => e.Claims)
-                .WithOne()
-                .HasForeignKey(uc => uc.UserId)
-                .IsRequired();
+        // Each User can have many UserClaims
+        builder.HasMany(e => e.Claims)
+            .WithOne()
+            .HasForeignKey(uc => uc.UserId)
+            .IsRequired();
 
-            // Each User can have many UserLogins
-            builder.HasMany(e => e.Logins)
-                .WithOne()
-                .HasForeignKey(ul => ul.UserId)
-                .IsRequired();
+        // Each User can have many UserLogins
+        builder.HasMany(e => e.Logins)
+            .WithOne()
+            .HasForeignKey(ul => ul.UserId)
+            .IsRequired();
 
-            // Each User can have many UserTokens
-            builder.HasMany(e => e.Tokens)
-                .WithOne()
-                .HasForeignKey(ut => ut.UserId)
-                .IsRequired();
+        // Each User can have many UserTokens
+        builder.HasMany(e => e.Tokens)
+            .WithOne()
+            .HasForeignKey(ut => ut.UserId)
+            .IsRequired();
 
-            // Each User can have many entries in the UserRole join table
-            builder.HasMany(e => e.UserRoles)
-                .WithOne()
-                .HasForeignKey(ur => ur.UserId)
-                .IsRequired();
-        }
+        // Each User can have many entries in the UserRole join table
+        builder.HasMany(e => e.UserRoles)
+            .WithOne()
+            .HasForeignKey(ur => ur.UserId)
+            .IsRequired();
     }
 }

@@ -18,6 +18,7 @@ namespace Authorization.Presentation.APIs.Identity
                 .MapGroup(BaseUrl).HasApiVersion(1);
 
             group1.MapPost("login", AuthenticationV1);
+            group1.MapPost("logout", LogoutV1);
 
 
             //var group2 = app.NewVersionedApi("authentication")
@@ -34,6 +35,13 @@ namespace Authorization.Presentation.APIs.Identity
                 return HandlerFailure(result);
 
             return Results.Ok(result);
+        }
+
+        private static async Task<IResult> LogoutV1(ISender sender)
+        {
+            // TODO CODE
+
+            return Results.Ok();
         }
     }
 }

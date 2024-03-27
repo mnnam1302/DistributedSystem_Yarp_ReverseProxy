@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Query.Application.Behaviors;
 
 namespace Query.Application.DependencyInjection.Extensions
 {
@@ -7,7 +9,9 @@ namespace Query.Application.DependencyInjection.Extensions
         public static IServiceCollection AddMediatRApplication(this IServiceCollection services)
         {
             services.AddMediatR(cfg =>
-                cfg.RegisterServicesFromAssembly(AssemblyReference.Assembly));
+                cfg.RegisterServicesFromAssembly(AssemblyReference.Assembly))
+                .AddTransient(typeof(IPipelineBehavior<,>),typeof(PerformancePipelineBehavior<,>))
+                .AddTransient(typeof(IPipelineBehavior<,>), typeof(TracingPipelineBehavior<,>));
 
             return services;
         }

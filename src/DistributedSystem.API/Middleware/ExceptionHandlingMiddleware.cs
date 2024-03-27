@@ -48,13 +48,9 @@ namespace DistributedSystem.API.Middleware
         private static int GetStatusCode(Exception exception) =>
             exception switch
             {
-
-                // Những exception mà mình tự định nghĩa
-                // Ví dụ BadRequest trả về 400
-                // Dùng if else ở đây nó không hay, dùng switch nó clean hơn
+                // switch statement
 
                 // Trường hợp throw ở domain => Domain driven design
-                IdentityException.TokenException => StatusCodes.Status401Unauthorized,
                 ProductException.ProductFieldException => StatusCodes.Status406NotAcceptable, // Should be remove later
                 
                 BadRequestException => StatusCodes.Status400BadRequest,
@@ -62,7 +58,7 @@ namespace DistributedSystem.API.Middleware
                 //Application.Exceptions.ValidationException => StatusCodes.Status422UnprocessableEntity,
                 //FluentValidation.ValidationException => StatusCodes.Status400BadRequest,
                 FormatException => StatusCodes.Status422UnprocessableEntity,
-                // Tường hợp mặc định, nếu không có th nào map ở trên thì trả về 500
+                // Trường hợp mặc định, nếu không có th nào map ở trên thì trả về 500
                 _ => StatusCodes.Status500InternalServerError
             };
 
