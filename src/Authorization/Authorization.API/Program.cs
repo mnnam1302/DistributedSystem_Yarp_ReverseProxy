@@ -41,7 +41,7 @@ builder.Services
         options.SubstituteApiVersionInUrl = true;
     });
 
-//builder.Services.AddJwtAuthenticationAPI(builder.Configuration); => VALIDATION AT SERVER ApiGateway
+//builder.Services.AddJwtAuthenticationAPI(builder.Configuration); //=> VALIDATION AT SERVER ApiGateway
 
 builder.Services.AddMediatRApplication();
 builder.Services.AddAutoMapperApplication();

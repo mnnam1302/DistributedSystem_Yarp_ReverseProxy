@@ -1,4 +1,6 @@
 ﻿using Authorization.Domain.Exceptions;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace Authorization.API.Middleware
