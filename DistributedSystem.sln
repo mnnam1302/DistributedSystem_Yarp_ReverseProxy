@@ -5,7 +5,9 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution items", "{598036D2-6B2E-41D8-982E-90561C8EB529}"
 	ProjectSection(SolutionItems) = preProject
-		docker-compose.Dev.infrastructure.yml = docker-compose.Dev.infrastructure.yml
+		otel-collector-config.yaml = otel-collector-config.yaml
+		prometheus.yaml = prometheus.yaml
+		docker-compose.Dev.infrastructure.yaml = docker-compose.Dev.infrastructure.yaml
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -51,17 +53,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGateway", "src\ReversePr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Authorization", "Authorization", "{C38C745B-C12B-485C-9B73-20C26BFF3AD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.API", "src\Authorization\Authorization.API\Authorization.API.csproj", "{5CBFA19E-796C-4B83-A4E4-3773C95883D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.API", "src\Authorization\Authorization.API\Authorization.API.csproj", "{5CBFA19E-796C-4B83-A4E4-3773C95883D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.Application", "src\Authorization\Authorization.Application\Authorization.Application.csproj", "{DED21778-95C8-41FE-97ED-56C500EE92EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Application", "src\Authorization\Authorization.Application\Authorization.Application.csproj", "{DED21778-95C8-41FE-97ED-56C500EE92EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.Domain", "src\Authorization\Authorization.Domain\Authorization.Domain.csproj", "{6CF491B4-D7D3-4FA2-BE39-5BD1ECD01DE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Domain", "src\Authorization\Authorization.Domain\Authorization.Domain.csproj", "{6CF491B4-D7D3-4FA2-BE39-5BD1ECD01DE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.Infrastructure", "src\Authorization\Authorization.Infrastructure\Authorization.Infrastructure.csproj", "{E4991F2F-0872-470E-AD4D-C33DFE16CA5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Infrastructure", "src\Authorization\Authorization.Infrastructure\Authorization.Infrastructure.csproj", "{E4991F2F-0872-470E-AD4D-C33DFE16CA5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.Persistence", "src\Authorization\Authorization.Persistence\Authorization.Persistence.csproj", "{4C4573B9-71CD-46EE-A1FF-C5CCEC3CB81F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Persistence", "src\Authorization\Authorization.Persistence\Authorization.Persistence.csproj", "{4C4573B9-71CD-46EE-A1FF-C5CCEC3CB81F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authorization.Presentation", "src\Authorization\Authorization.Presentation\Authorization.Presentation.csproj", "{54F1EED0-5981-4662-A09C-AA65DB933576}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Authorization.Presentation", "src\Authorization\Authorization.Presentation\Authorization.Presentation.csproj", "{54F1EED0-5981-4662-A09C-AA65DB933576}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

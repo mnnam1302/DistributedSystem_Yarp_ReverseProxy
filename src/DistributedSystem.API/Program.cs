@@ -74,6 +74,8 @@ builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration
 builder.Services.AddSqlPersistence();
 builder.Services.AddRepositoryPersistence();
 
+// Add OpenTelemetry
+builder.AddOpenTelemetryInfrastructure();
 
 // Add Middleware => Remember use middleware
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
