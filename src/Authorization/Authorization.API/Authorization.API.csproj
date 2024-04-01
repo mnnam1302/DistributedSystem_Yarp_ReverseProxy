@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\DistributedSystem.Contract\DistributedSystem.Contract.csproj" />
     <ProjectReference Include="..\Authorization.Application\Authorization.Application.csproj" />
     <ProjectReference Include="..\Authorization.Domain\Authorization.Domain.csproj" />
     <ProjectReference Include="..\Authorization.Infrastructure\Authorization.Infrastructure.csproj" />

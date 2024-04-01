@@ -53,6 +53,8 @@ builder.Services.AddMasstransitRabbitMQInfrastructure(builder.Configuration);
 // Add MongoDB
 builder.Services.AddServicesPersistence();
 
+// Add OpenTelemetry
+builder.AddOpenTelemetryInfrastructure();
 
 // Global Exception Handler
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();

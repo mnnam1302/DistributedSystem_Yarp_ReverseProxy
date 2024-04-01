@@ -1,0 +1,138 @@
+version: 3:9
+
+services:
+#    # SQL Server
+#    sqlserver:
+#        container_name: sqlserver
+#        image: mcr.microsoft.com/mssql/server:2019-latest
+#        environment:
+#            #Environment variables
+#            - ACCEPT_EULA=Y #Accept End-User License Agreement
+#            - SA_PASSWORD=Sa1302139@
+#        ports:
+#            - "1434:1433"
+#        restart: always
+#        mem_limit: 12g # Memory limit for the container
+#        memswap_limit: 13g
+#        networks:
+#            - yarp-reverse-pro#xy
+#    
+    # Redis
+    redis:
+        container_name: redis
+        image: redis:latest
+        ports:
+            - "6379:6379"
+        networks:
+            - yarp-reverse-proxy
+#    
+#    # MongoDB
+#    mongo:
+#        image: mongo
+#        container_name: mongo
+#        ports:
+#          - 27018:27017
+#        restart: always
+#        environment:
+#          MONGO_INITDB_ROOT_USERNAME: sa
+#          MONGO_INITDB_ROOT_PASSWORD: sa1302139
+#        networks:
+#            - yarp-reverse-proxy
+#    
+#    # Mongo Express
+#    mongo-express:
+#        image: mongo-express
+#        container_name: mongo-express
+#        ports:
+#            - 8082:8081
+#        restart: always
+#        environment:
+#            ME_CONFIG_MONGODB_ADMINUSERNAME: sa
+#            ME_CONFIG_MONGODB_ADMINPASSWORD: sa1302139
+#            ME_CONFIG_MONGODB_URL: mongodb://sa:sa1302139@mongo:27017/
+#        networks:
+#            - yarp-reverse-proxy
+# 
+   # RabbitMQ
+    rabbitmq:
+        container_name: rabbitmq
+        image: rabbitmq:3-management-alpine
+        healthcheck:
+            test: rabbitmq-diagnostics -q ping
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        environment:
+            RABBITMQ_DEFAULT_USER: "guest"
+            RABBITMQ_DEFAULT_PASS: "guest"
+            RABBITMQ_DEFAULT_VHOST: "nhatnam1302"
+        networks:
+            - yarp-reverse-proxy
+
+    # Jaeger
+    jaeger-all-in-one:
+        image: jaegertracing/all-in-one:latest
+        container_name: jaeger-all-in-one
+        ports:
+            - "16686:16686"
+            - "14268"
+            - "14250"
+        networks:
+            - yarp-reverse-proxy
+    
+    # Zipkin
+    zipkin-all-in-one:
+        image: openzipkin/zipkin:latest
+        container_name: zipkin-all-in-one
+        ports:
+            - "9411:9411"
+        networks:
+            - yarp-reverse-proxy
+    
+    # Collector
+    otel-collector:
+        image: otel/opentelemetry-collector-contrib:0.64.1
+        container_name: otel-collector
+        restart: always
+        command: ["--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}"]
+        volumes:
+            - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+        ports:
+            - "1888:1888"   # pprof extension
+            - "8888:8888"   # Prometheus metrics exposed by the collector
+            - "8889:8889"   # Prometheus exporter metrics
+            - "13133:13133" # health_check extension
+            - "4317:4317"   # OTLP gRPC receiver
+            - "55679:55679" # zpages extension
+        depends_on:
+            - jaeger-all-in-one
+            - zipkin-all-in-one
+        networks:
+            - yarp-reverse-proxy
+    
+    # Prometheus
+    prometheus:
+        image: prom/prometheus:latest
+        container_name: prometheus
+        volumes:
+            - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+        ports:
+            - "9090:9090"
+        networks:
+            - yarp-reverse-proxy
+
+#   # elk
+#   elk:
+#       image: sebp/elk:latest
+#       ports:
+#           - "5601:5601"
+#           - "9200:9200"
+#           - "5044:5044"
+#       networks:
+#           - distributed-systems
+
+networks:
+    yarp-reverse-proxy:

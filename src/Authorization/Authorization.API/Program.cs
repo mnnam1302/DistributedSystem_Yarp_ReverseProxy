@@ -54,7 +54,10 @@ builder.Services.AddRepositoryPersistence();
 builder.Services.AddServicesInfrastructure();
 builder.Services.AddRedisInfrastructure(builder.Configuration);
 
+// Add OpenTelemetry
+builder.AddOpenTelemetryInfrastructure();
 
+// Add Custom Middleware
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
 var app = builder.Build();

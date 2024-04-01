@@ -1,7 +1,5 @@
 using ApiGateway.DependecyInjection.Extensions;
 using ApiGateway.RateLimiter;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,18 +8,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Rate Limiter
 builder.Services.AddRateLimiting(builder.Configuration);
 
-// Add JWT
+// Add JWT Bearer
 builder.Services.AddJwtAuthenticationApiGateway(builder.Configuration);
 
 // Add Yarp Reverse Proxy
 builder.Services.AddYarpReverseProxyApiGateway(builder.Configuration);
 
 builder.Services.AddServicesApiGateway();
-
 builder.Services.AddRedisApiGateway(builder.Configuration);
 
-var app = builder.Build();
+// Add OpenTelemetry
+builder.AddOpenTelemetryInfrastructure();
 
+var app = builder.Build();
 
 //app.UseHttpsRedirection();
 
@@ -33,6 +32,5 @@ app.UseRateLimiter();
 //app.MapReverseProxy();
 //app.MapReverseProxy().RequireRateLimiting(RateLimitExtensions.PerUserRateLimit);
 app.MapReverseProxy().RequirePerUserLimit();
-
 
 app.Run();
