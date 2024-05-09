@@ -2,19 +2,19 @@ version: "3.9"
 
 services:
   # SQL Server
-  sqlserver:
-    container_name: yarp-sqlserver
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Sa1302139@
-    ports:
-      - "1434:1433"
-    restart: always
-    mem_limit: 12g
-    memswap_limit: 13g
-    networks:
-      - yarprevereseproxy_default
+  # sqlserver:
+  #   container_name: yarp-sqlserver
+  #   image: mcr.microsoft.com/mssql/server:2019-latest
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #     - SA_PASSWORD=Sa1302139@
+  #   ports:
+  #     - "1434:1433"
+  #   restart: always
+  #   mem_limit: 12g
+  #   memswap_limit: 13g
+  #   networks:
+  #     - yarprevereseproxy_default
 
   # Redis
   redis:
@@ -26,31 +26,31 @@ services:
       - yarprevereseproxy_default
 
   # MongoDB
-  mongo:
-    image: mongo
-    container_name: yarp-mongo
-    ports:
-      - "27018:27017"
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: sa
-      MONGO_INITDB_ROOT_PASSWORD: sa1302139
-    networks:
-      - yarprevereseproxy_default
+  # mongo:
+  #   image: mongo
+  #   container_name: yarp-mongo
+  #   ports:
+  #     - "27018:27017"
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: sa
+  #     MONGO_INITDB_ROOT_PASSWORD: sa1302139
+  #   networks:
+  #     - yarprevereseproxy_default
 
   # Mongo Express
-  mongo-express:
-    image: mongo-express
-    container_name: yarp-mongo-express
-    ports:
-      - "8082:8081"
-    restart: always
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: sa
-      ME_CONFIG_MONGODB_ADMINPASSWORD: sa1302139
-      ME_CONFIG_MONGODB_URL: mongodb://sa:sa1302139@mongo:27017/
-    networks:
-      - yarprevereseproxy_default
+  # mongo-express:
+  #   image: mongo-express
+  #   container_name: yarp-mongo-express
+  #   ports:
+  #     - "8082:8081"
+  #   restart: always
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: sa
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: sa1302139
+  #     ME_CONFIG_MONGODB_URL: mongodb://sa:sa1302139@mongo:27017/
+  #   networks:
+  #     - yarprevereseproxy_default
 
   # RabbitMQ
   rabbitmq:
@@ -70,6 +70,17 @@ services:
       RABBITMQ_DEFAULT_VHOST: "nhatnam1302"
     networks:
       - yarprevereseproxy_default
+  # Seq
+  seq:
+     container_name: yarp-seq
+     image: datalust/seq:latest
+     ports:
+        - 5341:5341
+        - 8081:80
+     environment:
+        ACCEPT_EULA: Y
+     networks:
+        - yarprevereseproxy_default
 
 networks:
   yarprevereseproxy_default:

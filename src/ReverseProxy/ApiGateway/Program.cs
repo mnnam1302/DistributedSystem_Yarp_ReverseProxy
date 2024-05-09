@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Addd Serilog
 Log.Logger = new LoggerConfiguration().ReadFrom
     .Configuration(builder.Configuration)
+    .Enrich.WithProperty("Application", "ApiGateway")
     .CreateLogger();
 
 builder.Logging
