@@ -22,43 +22,48 @@ builder.Logging
 
 builder.Host.UseSerilog();
 
-// Add Carter
-builder.Services.AddCarter();
+builder.Host.ConfigureServices((context, services) =>
+{
+    // Carter
+    builder.Services.AddCarter();
 
-// Add Swagger
-builder.Services
-    .AddSwaggerGenNewtonsoftSupport()
-    .AddFluentValidationRulesToSwagger()
-    .AddEndpointsApiExplorer()
-    .AddSwaggerAPI();
+    // Swagger
+    builder.Services
+        .AddSwaggerGenNewtonsoftSupport()
+        .AddFluentValidationRulesToSwagger()
+        .AddEndpointsApiExplorer()
+        .AddSwaggerAPI();
 
-// Add API versioning
-builder.Services
-    .AddApiVersioning(options => options.ReportApiVersions = true)
-    .AddApiExplorer(options =>
-    {
-        options.GroupNameFormat = "'v'VVV";
-        options.SubstituteApiVersionInUrl = true;
-    });
+    // API versioning
+    builder.Services
+        .AddApiVersioning(options => options.ReportApiVersions = true)
+        .AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
 
-//builder.Services.AddJwtAuthenticationAPI(builder.Configuration); //=> VALIDATION AT SERVER ApiGateway
-
-builder.Services.AddMediatRApplication();
-builder.Services.AddAutoMapperApplication();
-
-builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection("SqlServerRetryOptions"));
-builder.Services.AddSqlPersistence(builder.Configuration);
-builder.Services.AddRepositoryPersistence();
+    //builder.Services.AddJwtAuthenticationAPI(builder.Configuration); //=> VALIDATION AT SERVER ApiGateway
 
 
-builder.Services.AddServicesInfrastructure();
-builder.Services.AddRedisInfrastructure(builder.Configuration);
+    // Application
+    builder.Services.AddMediatRApplication();
+    builder.Services.AddAutoMapperApplication();
 
-// Add OpenTelemetry
-builder.AddOpenTelemetryInfrastructure();
+    // Persistence
+    builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection("SqlServerRetryOptions"));
+    builder.Services.AddSqlPersistence(builder.Configuration);
+    builder.Services.AddRepositoryPersistence();
 
-// Add Custom Middleware
-builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+    // Infrastructure
+    builder.Services.AddServicesInfrastructure();
+    builder.Services.AddRedisInfrastructure(builder.Configuration);
+    //builder.AddOpenTelemetryInfrastructure();
+
+    // Add Custom Middleware
+    builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+});
+
 
 var app = builder.Build();
 

@@ -24,7 +24,8 @@ namespace Authorization.Presentation.APIs.Identity
             //var group2 = app.NewVersionedApi("authentication")
             //    .MapGroup(BaseUrl).HasApiVersion(2);
 
-            //group2.MapPost("login", () => "");
+            //group2.MapGet("sign-in", () => "");
+            //group2.MapGet("sign-out", () => "");
         }
 
         private static async Task<IResult> AuthenticationV1(ISender sender, [FromBody] DistributedSystem.Contract.Services.V1.Identity.Query.GetLoginQuery login)

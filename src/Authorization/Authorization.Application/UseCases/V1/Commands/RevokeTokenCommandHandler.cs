@@ -19,17 +19,17 @@ namespace Authorization.Application.UseCases.V1.Commands
 
         public async Task<Result> Handle(Command.RevokeTokenCommand request, CancellationToken cancellationToken)
         {
-            string AccessToken = request.AccessToken;
+            //string AccessToken = request.AccessToken;
 
-            var principal = _jwtTokenService.GetPrincipalFromExpiredToken(AccessToken);
-            var emailKey = principal.FindFirstValue(ClaimTypes.Email).ToString();
+            //var principal = _jwtTokenService.GetPrincipalFromExpiredToken(AccessToken);
+            //var emailKey = principal.FindFirstValue(ClaimTypes.Email).ToString();
 
-            var authenticated = await _cacheService.GetAsync<Response.Authenticated>(emailKey);
+            //var authenticated = await _cacheService.GetAsync<Response.Authenticated>(emailKey);
 
-            if (authenticated is null)
-                throw new Exception("Can not get value from Redis");
+            //if (authenticated is null)
+            //    throw new Exception("Can not get value from Redis");
 
-            await _cacheService.RemoveAsync(emailKey, cancellationToken);
+            //await _cacheService.RemoveAsync(emailKey, cancellationToken);
 
             return Result.Success();
         }

@@ -15,17 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.16" />
   </ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="OpenTelemetry" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.7.1" />
-		<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.7.0" />
-	</ItemGroup>
 
 </Project>

@@ -9,9 +9,7 @@ using Query.Application.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-
+// Add Serilog
 Log.Logger = new LoggerConfiguration().ReadFrom
     .Configuration(builder.Configuration)
     .CreateLogger();
@@ -22,43 +20,46 @@ builder.Logging
 
 builder.Host.UseSerilog();
 
-// Add Carter
-builder.Services.AddCarter();
+builder.Host.ConfigureServices((context, servies) =>
+{
+    // Carter
+    builder.Services.AddCarter();
 
-// Add Swagger
-builder.Services
-    .AddSwaggerGenNewtonsoftSupport()
-    .AddFluentValidationRulesToSwagger()
-    .AddEndpointsApiExplorer()
-    .AddSwaggerAPI();
+    // Swagger
+    builder.Services
+        .AddSwaggerGenNewtonsoftSupport()
+        .AddFluentValidationRulesToSwagger()
+        .AddEndpointsApiExplorer()
+        .AddSwaggerAPI();
 
-// Add API versioning
-builder.Services
-    .AddApiVersioning(options => options.ReportApiVersions = true)
-    .AddApiExplorer(options =>
-    {
-        // Read more to understand Format: https://github.com/dotnet/aspnet-api-versioning/wiki/Version-Format#custom-api-version-format-strings
-        options.GroupNameFormat = "'v'VVV";
-        options.SubstituteApiVersionInUrl = true;
-    });
-
-
-builder.Services.AddMediatRApplication();
-
-
-builder.Services.AddServicesInfrastructure(builder.Configuration);
-builder.Services.AddMasstransitRabbitMQInfrastructure(builder.Configuration);
+    // API versioning
+    builder.Services
+        .AddApiVersioning(options => options.ReportApiVersions = true)
+        .AddApiExplorer(options =>
+        {
+            // Read more to understand Format: https://github.com/dotnet/aspnet-api-versioning/wiki/Version-Format#custom-api-version-format-strings
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
 
 
-// Add MongoDB
-builder.Services.AddServicesPersistence();
+    builder.Services.AddMediatRApplication();
 
-// Add OpenTelemetry
-builder.AddOpenTelemetryInfrastructure();
 
-// Global Exception Handler
-builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+    builder.Services.AddServicesInfrastructure(builder.Configuration);
+    builder.Services.AddMasstransitRabbitMQInfrastructure(builder.Configuration);
 
+
+    // MongoDB
+    builder.Services.AddServicesPersistence();
+
+    // OpenTelemetry
+    //builder.AddOpenTelemetryInfrastructure();
+
+    // Global Exception Handler
+    builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
+});
 
 var app = builder.Build();
 

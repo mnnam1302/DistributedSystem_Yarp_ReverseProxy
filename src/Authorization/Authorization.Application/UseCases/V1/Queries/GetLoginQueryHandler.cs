@@ -2,6 +2,7 @@
 using Authorization.Domain.Abstractions.Repositories;
 using Authorization.Domain.Entities;
 using Authorization.Domain.Exceptions;
+using Authorization.Persistence;
 using DistributedSystem.Contract.Abstractions.Message;
 using DistributedSystem.Contract.Abstractions.Shared;
 using DistributedSystem.Contract.Services.V1.Identity;
@@ -15,44 +16,38 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
     private readonly ICacheService _cacheService;
     private readonly IPasswordHasherService _passwordHasherService;
     private readonly IRepositoryBase<AppUser, Guid> _userRepository;
+    private readonly IEncryptService _encryptService;
+    private readonly ApplicationDbContext _dbContext;
 
     public GetLoginQueryHandler(
         IJwtTokenService jwtTokenService, 
         ICacheService cacheService,
         IPasswordHasherService passwordHasherService,
-        IRepositoryBase<AppUser, Guid> userRepository
-        )
+        IRepositoryBase<AppUser, Guid> userRepository,
+        IEncryptService encryptService,
+        ApplicationDbContext dbContext)
     {
         _jwtTokenService = jwtTokenService;
         _cacheService = cacheService;
         _passwordHasherService = passwordHasherService;
         _userRepository = userRepository;
+        _encryptService = encryptService;
+        _dbContext = dbContext;
     }
 
-    /// <summary>
-    /// 1. Get user by email
-    /// 2. Using salt to hash password to compare with password in database
-    /// 3. Get user claims
-    /// 4. Generate access token and refresh token
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
     public async Task<Result<Response.Authenticated>> Handle(Query.GetLoginQuery request, CancellationToken cancellationToken)
     {
-        //Check user
-        var user = await _userRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken);
+        // Get User by Email
+        var user = await _userRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken)
+            ?? throw new AppUserException.UserNotFoundByEmailException(request.Email);
 
-        if (user is null)
-            throw new AppUserException.UserNotFoundByEmailException(request.Email);
-
-        var isAuthentication = _passwordHasherService.VerifyPassword(request.Password, 
-                                                                        user.PasswordHash, 
-                                                                        user.PasswordSalt);
+        // Step 02: Verify password
+        var isAuthentication = _passwordHasherService.VerifyPassword(request.Password, user.PasswordHash!, user.PasswordSalt);
 
         if (!isAuthentication)
             throw new IdentityException.AuthenticatedException();
 
+        // Step 03: Get user claims
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -60,7 +55,18 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
             new(ClaimTypes.Email, user.Email),
         };
 
-        string accessToken = _jwtTokenService.GenerateAccessToken(claims);
+        // Step 04: Handle Asymetric encryption
+        /*
+         * PrivateKey => Generate Access Token - Correct
+         * PrivateKey => Generate Access Token => Error => Correct
+         * PublicKet => Verify Access Token - Correct
+         * 
+         * Problem:
+         * PrivateKey => Verify Access Token => Error
+         */
+        var keyPair = _encryptService.GenerateRsaKeyPair();
+
+        string accessToken = _jwtTokenService.GenerateAccessToken(claims, keyPair.privateKey);
         string refreshToken = _jwtTokenService.GenerateRefreshToken();
 
         var result = new Response.Authenticated

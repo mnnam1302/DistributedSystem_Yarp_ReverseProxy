@@ -10,76 +10,69 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Add configuration
 
-
+// Add Serilog
 Log.Logger = new LoggerConfiguration().ReadFrom
     .Configuration(builder.Configuration)
     .CreateLogger();
 
-// Add Serilog
 builder.Logging
     .ClearProviders()
     .AddSerilog();
 
 builder.Host.UseSerilog();
 
+builder.Host.ConfigureServices((context, services) =>
+{
+    // Carter
+    builder.Services.AddCarter();
 
-// Add Carter module
-builder.Services.AddCarter();
+    // Read more: Use in case for Controller API DistributedSystem.Presentation
+    //builder.
+    //    Services
+    //    .AddControllers()
+    //    .AddApplicationPart(DistributedSystem.Persistence.AssemblyReference.Assembly);
 
-// Read more: Use in case for Controller API DistributedSystem.Presentation
-//builder.
-//    Services
-//    .AddControllers()
-//    .AddApplicationPart(DistributedSystem.Persistence.AssemblyReference.Assembly);
+    // Swagger
+    builder.Services
+        .AddSwaggerGenNewtonsoftSupport()
+        .AddFluentValidationRulesToSwagger()
+        .AddEndpointsApiExplorer()
+        .AddSwaggerAPI();
 
-// Add Swagger
-builder.Services
-    .AddSwaggerGenNewtonsoftSupport()
-    .AddFluentValidationRulesToSwagger()
-    .AddEndpointsApiExplorer()
-    .AddSwaggerAPI();
+    // API versioning
+    builder.Services
+        .AddApiVersioning(options => options.ReportApiVersions = true)
+        .AddApiExplorer(options =>
+        {
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
 
-// Add API versioning
-builder.Services
-    .AddApiVersioning(options => options.ReportApiVersions = true)
-    .AddApiExplorer(options =>
-    {
-        options.GroupNameFormat = "'v'VVV";
-        options.SubstituteApiVersionInUrl = true;
-    });
+    // Add Jwt Authentication => After, app.UseAuthentication(); app.UseAuthorization();
+    //builder.Services.AddJwtAuthenticationAPI(builder.Configuration); => VALIDATION AT SERVER ApiGateway
 
-// Add Jwt Authentication => After, app.UseAuthentication(); app.UseAuthorization();
-//builder.Services.AddJwtAuthenticationAPI(builder.Configuration); => VALIDATION AT SERVER ApiGateway
+    // Application
+    builder.Services.AddMediatRApplication();
+    builder.Services.AddAutoMapperApplication();
 
+    // Infrastructure
+    builder.Services.AddMasstransitRabbitMQInfrastructure(builder.Configuration);
+    builder.Services.AddQuartzInfrastructure();
+    builder.Services.AddMediatRInfrastructure();
+    builder.Services.AddServicesInfrastructure();
+    builder.Services.AddRedisInfrastructure(builder.Configuration);
+    //builder.AddOpenTelemetryInfrastructure();
 
-builder.Services.AddMediatRApplication();
-builder.Services.AddAutoMapperApplication();
+    // Persustence
+    builder.Services.AddInterceptorPersistence();
+    builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
+    builder.Services.AddSqlPersistence();
+    builder.Services.AddRepositoryPersistence();
 
-// Configure masstransit rabbitmq
-builder.Services.AddMasstransitRabbitMQInfrastructure(builder.Configuration);
-builder.Services.AddQuartzInfrastructure();
-builder.Services.AddMediatRInfrastructure();
-builder.Services.AddServicesInfrastructure();
-builder.Services.AddRedisInfrastructure(builder.Configuration);
-
-
-// Configure Options and SQL =>  remember mapcarter
-// Pass Configuration good - builder.Configuration.GetSection(nameof(SqlServerRetryOptions))
-// Not hard code at ConfigureSqlServerRetryOptions at Persistence ** My ERROR
-builder.Services.AddInterceptorPersistence();
-builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
-builder.Services.AddSqlPersistence();
-builder.Services.AddRepositoryPersistence();
-
-// Add OpenTelemetry
-builder.AddOpenTelemetryInfrastructure();
-
-// Add Middleware => Remember use middleware
-builder.Services.AddTransient<ExceptionHandlingMiddleware>();
-
+    // Add Middleware => Remember use middleware
+    builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+});
 
 var app = builder.Build();
 
@@ -94,7 +87,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 //app.MapControllers(); // Use in case Controller API
 
 // Add API endpoint with Carter module
-app.MapCarter(); // Must be after authenticatio and authorization
+app.MapCarter(); // Must be after authentication and authorization
 
 
 // Configure the HTTP request pipeline.
