@@ -1,7 +1,6 @@
-﻿namespace Authorization.Domain.Abstractions.Entities
+﻿namespace Authorization.Domain.Abstractions.Entities;
+
+public interface IEntity<T>
 {
-    public interface IEntity<T>
-    {
-        T Id { get; }
-    }
+    T Id { get; }
 }

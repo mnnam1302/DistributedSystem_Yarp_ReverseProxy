@@ -1,54 +1,54 @@
-﻿using Authorization.Infrastructure.DependecyInjection.Options;
+﻿using System.Text;
+using Authorization.Infrastructure.DependecyInjection.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
-namespace Authorization.API.DependencyInjection.Extensions
+namespace Authorization.API.DependencyInjection.Extensions;
+
+public static class JwtExtensions
 {
-    public static class JwtExtensions
+    public static void AddJwtAuthenticationAPI(this IServiceCollection services, IConfiguration configuration)
     {
-        public static void AddJwtAuthenticationAPI(this IServiceCollection services, IConfiguration configuration)
+        services.AddAuthentication(options =>
         {
-            services.AddAuthentication(options =>
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                JwtOptions jwtOptions = new JwtOptions();
+                configuration.GetSection(nameof(JwtOptions)).Bind(jwtOptions);
+
+                options.SaveToken = true;
+
+                var key = Encoding.UTF8.GetBytes(jwtOptions.SecretKey);
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    JwtOptions jwtOptions = new JwtOptions();
-                    configuration.GetSection(nameof(JwtOptions)).Bind(jwtOptions);
+                    ValidateIssuer = true, // on production, set to true
+                    ValidateAudience = true, // on production, set to true
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero
+                };
 
-                    options.SaveToken = true;
-
-                    var Key = Encoding.UTF8.GetBytes(jwtOptions.SecretKey);
-                    options.TokenValidationParameters = new TokenValidationParameters
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
                     {
-                        ValidateIssuer = true, // on production, set to true
-                        ValidateAudience = true, // on production, set to true
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtOptions.Issuer,
-                        ValidAudience = jwtOptions.Audience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Key),
-                        ClockSkew = TimeSpan.Zero
-                    };
-
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnAuthenticationFailed = context =>
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                         {
-                            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                            {
-                                context.Response.Headers.Add("IS-TOKEN-EXPIRED-Authorized-Server", "true");
-                            }
-                            return Task.CompletedTask;
+                            context.Response.Headers.Add("IS-TOKEN-EXPIRED-Authorized-Server", "true");
                         }
-                    };
-                });
 
-            services.AddAuthorization();
-        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+        services.AddAuthorization();
     }
 }

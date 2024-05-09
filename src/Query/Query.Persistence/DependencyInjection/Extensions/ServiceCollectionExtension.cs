@@ -2,13 +2,12 @@
 using Query.Domain.Abstractions.Repositories;
 using Query.Persistence.Repositories;
 
-namespace Query.Persistence.DependencyInjection.Extensions
+namespace Query.Persistence.DependencyInjection.Extensions;
+
+public static class ServiceCollectionExtension
 {
-    public static class ServiceCollectionExtension
+    public static void AddServicesPersistence(this IServiceCollection services)
     {
-        public static void AddServicesPersistence(this IServiceCollection services)
-        {
-            services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-        }
+        services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
     }
 }

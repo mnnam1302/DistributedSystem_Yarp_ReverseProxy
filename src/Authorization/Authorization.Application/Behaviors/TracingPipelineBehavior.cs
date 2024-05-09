@@ -17,7 +17,7 @@ public class TracingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
-    { 
+    {
         // Log all request
         _timer.Start();
         var response = await next();
@@ -25,8 +25,9 @@ public class TracingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TR
 
         var elapsedMilliseconds = _timer.ElapsedMilliseconds;
         var requestName = typeof(TRequest).Name;
-        _logger.LogInformation("Request Details: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}",
-                                              requestName, elapsedMilliseconds, request);
+        _logger.LogInformation(
+            "Request Details: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}",
+            requestName, elapsedMilliseconds, request);
 
         return response;
     }

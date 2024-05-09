@@ -1,9 +1,8 @@
-﻿namespace Query.Domain.Abstractions.Options
-{
-    public interface IMongoDbSettings
-    {
-        string ConnectionString { get; set; }
+﻿namespace Query.Domain.Abstractions.Options;
 
-        string DatabaseName { get; set; }
-    }
+public interface IMongoDbSettings
+{
+    string ConnectionString { get; set; }
+
+    string DatabaseName { get; set; }
 }

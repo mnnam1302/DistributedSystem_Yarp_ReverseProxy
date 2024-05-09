@@ -3,7 +3,7 @@
 public class OtlpOptions
 {
     public string UseTracingExporter { get; set; }
-    
+
     public string UseMetricsExporter { get; set; }
 
     public string UseLogExporter { get; set; }

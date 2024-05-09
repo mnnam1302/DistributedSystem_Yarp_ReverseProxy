@@ -56,7 +56,6 @@ app.UseAuthorization();
 //app.MapReverseProxy().RequireRateLimiting(RateLimitExtensions.PerUserRateLimit);
 app.MapReverseProxy().RequirePerUserLimit();
 
-
 try
 {
     await app.RunAsync();

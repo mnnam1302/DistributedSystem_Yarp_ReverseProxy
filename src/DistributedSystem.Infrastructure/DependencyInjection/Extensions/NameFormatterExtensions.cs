@@ -1,17 +1,16 @@
-﻿using MassTransit;
-using System.Reflection;
+﻿using System.Reflection;
+using MassTransit;
 
-namespace DistributedSystem.Infrastructure.DependencyInjection.Extensions
+namespace DistributedSystem.Infrastructure.DependencyInjection.Extensions;
+
+internal static class NameFormatterExtensions
 {
-    internal static class NameFormatterExtensions
-    {
-        public static string ToKebabCaseString(this MemberInfo member)
-            => KebabCaseEndpointNameFormatter.Instance.SanitizeName(member.Name);
-    }
+    public static string ToKebabCaseString(this MemberInfo member)
+        => KebabCaseEndpointNameFormatter.Instance.SanitizeName(member.Name);
+}
 
-    internal class KebabCaseEntityNameFormatter : IEntityNameFormatter
-    {
-        public string FormatEntityName<T>()
-            => typeof(T).ToKebabCaseString();
-    }
+internal class KebabCaseEntityNameFormatter : IEntityNameFormatter
+{
+    public string FormatEntityName<T>()
+        => typeof(T).ToKebabCaseString();
 }

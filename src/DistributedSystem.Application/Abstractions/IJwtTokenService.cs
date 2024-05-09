@@ -1,11 +1,12 @@
 ﻿using System.Security.Claims;
 
-namespace DistributedSystem.Application.Abstractions
+namespace DistributedSystem.Application.Abstractions;
+
+public interface IJwtTokenService
 {
-    public interface IJwtTokenService
-    {
-        string GenerateAccessToken(IEnumerable<Claim> claims);
-        string GenerateRefreshToken();
-        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
-    }
+    string GenerateAccessToken(IEnumerable<Claim> claims);
+
+    string GenerateRefreshToken();
+
+    ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
 }

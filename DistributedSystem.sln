@@ -5,8 +5,10 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution items", "{598036D2-6B2E-41D8-982E-90561C8EB529}"
 	ProjectSection(SolutionItems) = preProject
-		otel-collector-config.yaml = otel-collector-config.yaml
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
 		docker-compose.Development.infrastructure.yaml = docker-compose.Development.infrastructure.yaml
+		otel-collector-config.yaml = otel-collector-config.yaml
 		prometheus.yaml = prometheus.yaml
 		README.md = README.md
 	EndProjectSection

@@ -1,8 +1,8 @@
-﻿namespace Authorization.Domain.Entities
+﻿namespace Authorization.Domain.Entities;
+
+public class ActionInFunction
 {
-    public class ActionInFunction
-    {
-        public string ActionId { get; set; }
-        public string FunctionId { get; set; }
-    }
+    public string ActionId { get; set; }
+
+    public string FunctionId { get; set; }
 }

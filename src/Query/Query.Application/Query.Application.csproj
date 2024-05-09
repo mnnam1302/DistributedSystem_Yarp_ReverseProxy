@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DependencyInjection\Options\" />
     <Folder Include="Behaviors\" />
     <Folder Include="UseCases\V1\Queries\Identity\" />
   </ItemGroup>

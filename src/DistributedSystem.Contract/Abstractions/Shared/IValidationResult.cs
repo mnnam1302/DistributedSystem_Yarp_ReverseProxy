@@ -1,10 +1,10 @@
-﻿namespace DistributedSystem.Contract.Abstractions.Shared
+﻿namespace DistributedSystem.Contract.Abstractions.Shared;
+
+public interface IValidationResult
 {
-    public interface IValidationResult
-    {
-        public static readonly Error ValidationError = new(
-            "ValidationError",
-            "A validation problem occurred.");
-        Error[] Errors { get; }
-    }
+    public static readonly Error ValidationError = new(
+        "ValidationError",
+        "A validation problem occurred.");
+
+    Error[] Errors { get; }
 }

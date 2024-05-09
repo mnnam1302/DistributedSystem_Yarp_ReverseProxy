@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Authorization.Persistence.DependencyInjection.Options
+namespace Authorization.Persistence.DependencyInjection.Options;
+
+public record SqlServerRetryOptions
 {
-    public record SqlServerRetryOptions
-    {
-        [Required, Range(5, 20)]
-        public int MaxRetryCount { get; init; }
+    [Required, Range(5, 20)]
+    public int MaxRetryCount { get; init; }
 
-        [Required, Timestamp]
-        public TimeSpan MaxRetryDelay { get; init; }
+    [Required, Timestamp]
+    public TimeSpan MaxRetryDelay { get; init; }
 
-        public int[]? ErrorNumbersoAdd { get; init; }
-    }
+    public int[]? ErrorNumbersoAdd { get; init; }
 }

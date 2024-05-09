@@ -1,76 +1,74 @@
-﻿using DistributedSystem.Domain.Abstractions.Entities;
+﻿using System.Linq.Expressions;
+using DistributedSystem.Domain.Abstractions.Entities;
 using DistributedSystem.Domain.Abstractions.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
-namespace DistributedSystem.Persistence.Repositories
+namespace DistributedSystem.Persistence.Repositories;
+
+public class RepositoryBaseDbContext<TContext, TEntity, TKey> : IRepositoryBaseDbContext<TContext, TEntity, TKey>, IDisposable
+    where TContext : DbContext
+    where TEntity : Entity<TKey>
 {
-    public class RepositoryBaseDbContext<TContext, TEntity, TKey> : IRepositoryBaseDbContext<TContext, TEntity, TKey>, IDisposable
-        where TContext: DbContext
-        where TEntity : Entity<TKey>
+    private readonly TContext _dbContext;
+
+    public RepositoryBaseDbContext(TContext dbContext)
     {
-        private readonly TContext _dbContext;
+        _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+    }
 
-        public RepositoryBaseDbContext(TContext dbContext)
+    public void Dispose() => _dbContext?.Dispose();
+
+    public IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includeProperties)
+    {
+        IQueryable<TEntity> items = _dbContext.Set<TEntity>().AsNoTracking(); // Important to use AsNoTracking to improve performance - Always include AsNoTracking for Query Side
+
+        if (includeProperties != null)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        }
-
-        public void Dispose()
-        {
-            _dbContext?.Dispose();
-        }
-
-        public IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includeProperties)
-        {
-            IQueryable<TEntity> items = _dbContext.Set<TEntity>().AsNoTracking(); // Important to use AsNoTracking to improve performance - Always include AsNoTracking for Query Side
-
-            if (includeProperties != null)
+            foreach (var includeProperty in includeProperties)
             {
-                foreach (var includeProperty in includeProperties)
-                {
-                    items = items.Include(includeProperty);
-                }
+                items = items.Include(includeProperty);
             }
-
-            if (predicate != null)
-                items.Where(predicate);
-
-            return items;
         }
 
-        public async Task<TEntity> FindByIdAsync(TKey id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties)
+        if (predicate != null)
         {
-            return await FindAll(null, includeProperties)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+            items.Where(predicate);
         }
 
-        public async Task<TEntity> FindSingleAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties)
-        {
-            return await FindAll(predicate, includeProperties)
-                .AsNoTracking()
-                .SingleOrDefaultAsync(cancellationToken);
-        }
+        return items;
+    }
 
-        public void Add(TEntity entity)
-        {
-            _dbContext.Set<TEntity>().Add(entity);
-        }
+    public async Task<TEntity> FindByIdAsync(TKey id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties)
+    {
+        return await FindAll(null, includeProperties)
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id.Equals(id), cancellationToken);
+    }
 
-        public void Update(TEntity entity)
-        {
-            _dbContext.Set<TEntity>().Update(entity);
-        }
+    public async Task<TEntity> FindSingleAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties)
+    {
+        return await FindAll(predicate, includeProperties)
+            .AsNoTracking()
+            .SingleOrDefaultAsync(cancellationToken);
+    }
 
-        public void Remove(TEntity entity)
-        {
-            _dbContext.Set<TEntity>().Remove(entity);
-        }
+    public void Add(TEntity entity)
+    {
+        _dbContext.Set<TEntity>().Add(entity);
+    }
 
-        public void RemoveMultiple(List<TEntity> entities)
-        {
-            _dbContext.Set<TEntity>().RemoveRange(entities);
-        }
+    public void Update(TEntity entity)
+    {
+        _dbContext.Set<TEntity>().Update(entity);
+    }
+
+    public void Remove(TEntity entity)
+    {
+        _dbContext.Set<TEntity>().Remove(entity);
+    }
+
+    public void RemoveMultiple(List<TEntity> entities)
+    {
+        _dbContext.Set<TEntity>().RemoveRange(entities);
     }
 }

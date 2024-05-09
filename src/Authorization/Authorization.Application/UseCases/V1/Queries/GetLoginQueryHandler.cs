@@ -45,14 +45,16 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
         var isAuthentication = _passwordHasherService.VerifyPassword(request.Password, user.PasswordHash!, user.PasswordSalt);
 
         if (!isAuthentication)
+        {
             throw new IdentityException.AuthenticatedException();
+        }
 
         // Step 03: Get user claims
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.FullName),
-            new(ClaimTypes.Email, user.Email),
+            new (ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new (ClaimTypes.Name, user.FullName),
+            new (ClaimTypes.Email, user.Email),
         };
 
         // Step 04: Handle Asymetric encryption

@@ -1,4 +1,5 @@
-﻿using DistributedSystem.Contract.JsonConverters;
+﻿using System.Reflection;
+using DistributedSystem.Contract.JsonConverters;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,6 @@ using Newtonsoft.Json;
 using Query.Domain.Abstractions.Options;
 using Query.Infrastructure.DependencyInjection.Options;
 using Query.Infrastructure.PipelineObservers;
-using System.Reflection;
 
 namespace Query.Infrastructure.DependencyInjection.Extensions;
 
@@ -46,13 +46,11 @@ public static class ServiceCollectionExtension
                     h.Password(massTransitConfiguration.Password);
                 });
 
-                bus.UseMessageRetry(retry =>
-                {
-                    retry.Incremental(
+                bus.UseMessageRetry(retry 
+                    => retry.Incremental(
                         retryLimit: messageBusOptions.RetryLimit,
                         initialInterval: messageBusOptions.InitialInterval,
-                        intervalIncrement: messageBusOptions.IntervalIncrement);
-                });
+                        intervalIncrement: messageBusOptions.IntervalIncrement));
 
                 // I want to serialized when send message to RabbitMQ
                 // And deserialized when receive message from RabbitMQ

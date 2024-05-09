@@ -1,4 +1,4 @@
-﻿using ApiGateway.DependecyInjection.Options;
+using ApiGateway.DependecyInjection.Options;
 using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
 using System.Threading.RateLimiting;
@@ -25,7 +25,7 @@ public static class RateLimitExtensions
                 /*
                  * Rate limiting by IP address can be a good layer of security for unauthenticated users.
                  * Use this case => Have to put UseRateLimiter() after UseAuthentication() and UseAuthorization()
-                 * var userId = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                 * var userId = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"
                  */
 
                 /*
@@ -43,7 +43,7 @@ public static class RateLimitExtensions
                         ReplenishmentPeriod = TimeSpan.FromSeconds(rateLimitOptions.ReplenishmentPeriod),
                         TokensPerPeriod = rateLimitOptions.TokensPerPeriod,
                         AutoReplenishment = true,
-                        QueueLimit = rateLimitOptions.QueueLimit
+                        QueueLimit = rateLimitOptions.QueueLimit,
                     }
                 );
             });
@@ -53,7 +53,5 @@ public static class RateLimitExtensions
     }
 
     public static IEndpointConventionBuilder RequirePerUserLimit(this IEndpointConventionBuilder builder)
-    {
-        return builder.RequireRateLimiting(PerUserRateLimit);
-    }
+        => builder.RequireRateLimiting(PerUserRateLimit);
 }

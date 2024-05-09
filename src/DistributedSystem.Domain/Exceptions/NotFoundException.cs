@@ -1,10 +1,9 @@
-﻿namespace DistributedSystem.Domain.Exceptions
+﻿namespace DistributedSystem.Domain.Exceptions;
+
+public class NotFoundException : DomainException
 {
-    public class NotFoundException : DomainException
+    protected NotFoundException(string message)
+        : base("Not Found", message)
     {
-        protected NotFoundException(string message)
-            : base("Not Found", message)
-        {
-        }
     }
 }

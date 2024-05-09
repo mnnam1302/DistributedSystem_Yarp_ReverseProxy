@@ -5,58 +5,57 @@ using Query.Domain.Abstractions.Repositories;
 using Query.Domain.Entities;
 using Query.Domain.Exceptions;
 
-namespace Query.Application.UseCases.V1.Commands.Product
+namespace Query.Application.UseCases.V1.Commands.Product;
+
+public class ProductProjectionDetailsWhenProductChangeEventHandler
+    : ICommandHandler<DomainEvent.ProductCreated>,
+    ICommandHandler<DomainEvent.ProductUpdated>,
+    ICommandHandler<DomainEvent.ProductDeleted>
 {
-    public class ProductProjectionDetailsWhenProductChangeEventHandler
-        : ICommandHandler<DomainEvent.ProductCreated>,
-        ICommandHandler<DomainEvent.ProductUpdated>,
-        ICommandHandler<DomainEvent.ProductDeleted>
+    private readonly IMongoRepository<ProductProjection> _productRepository;
+
+    public ProductProjectionDetailsWhenProductChangeEventHandler(IMongoRepository<ProductProjection> productRepository)
     {
-        private readonly IMongoRepository<ProductProjection> _productRepository;
+        _productRepository = productRepository;
+    }
 
-        public ProductProjectionDetailsWhenProductChangeEventHandler(IMongoRepository<ProductProjection> productRepository)
+    public async Task<Result> Handle(DomainEvent.ProductCreated request, CancellationToken cancellationToken)
+    {
+        var productProjection = new ProductProjection()
         {
-            _productRepository = productRepository;
-        }
+            DocumentId = request.Id,
+            Name = request.Name,
+            Price = request.Price,
+            Description = request.Description,
+        };
 
-        public async Task<Result> Handle(DomainEvent.ProductCreated request, CancellationToken cancellationToken)
-        {
-            var productProjection = new ProductProjection()
-            {
-                DocumentId = request.Id,
-                Name = request.Name,
-                Price = request.Price,
-                Description = request.Description,
-            };
+        await _productRepository.InsertOneAsync(productProjection);
 
-            await _productRepository.InsertOneAsync(productProjection);
+        return Result.Success();
+    }
 
-            return Result.Success();
-        }
+    public async Task<Result> Handle(DomainEvent.ProductUpdated request, CancellationToken cancellationToken)
+    {
+        var product = await _productRepository.FindOneAsync(p => p.DocumentId == request.Id)
+            ?? throw new ProductException.ProductNotFoundException(request.Id);
 
-        public async Task<Result> Handle(DomainEvent.ProductUpdated request, CancellationToken cancellationToken)
-        {
-            var product = await _productRepository.FindOneAsync(p => p.DocumentId == request.Id)
-                ?? throw new ProductException.ProductNotFoundException(request.Id);
+        product.Name = request.Name;
+        product.Description = request.Description;
+        product.Price = request.Price;
+        product.ModifiedOnUtc = DateTime.UtcNow;
 
-            product.Name = request.Name;
-            product.Description = request.Description;
-            product.Price = request.Price;
-            product.ModifiedOnUtc = DateTime.UtcNow;
+        await _productRepository.ReplaceOneAsync(product);
 
-            await _productRepository.ReplaceOneAsync(product);
+        return Result.Success();
+    }
 
-            return Result.Success();
-        }
+    public async Task<Result> Handle(DomainEvent.ProductDeleted request, CancellationToken cancellationToken)
+    {
+        var productProjection = await _productRepository.FindOneAsync(p => p.DocumentId == request.Id)
+            ?? throw new ProductException.ProductNotFoundException(request.Id);
 
-        public async Task<Result> Handle(DomainEvent.ProductDeleted request, CancellationToken cancellationToken)
-        {
-            var productProjection = await _productRepository.FindOneAsync(p => p.DocumentId == request.Id)
-                ?? throw new ProductException.ProductNotFoundException(request.Id);
+        await _productRepository.DeleteOneAsync(p => p.DocumentId == request.Id);
 
-            await _productRepository.DeleteOneAsync(p => p.DocumentId == request.Id);
-
-            return Result.Success();
-        }
+        return Result.Success();
     }
 }

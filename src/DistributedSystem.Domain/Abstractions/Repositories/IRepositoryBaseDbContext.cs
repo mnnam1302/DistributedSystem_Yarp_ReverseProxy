@@ -1,29 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
-namespace DistributedSystem.Domain.Abstractions.Repositories
+namespace DistributedSystem.Domain.Abstractions.Repositories;
+
+public interface IRepositoryBaseDbContext<TContext, TEntity, TKey>
+    where TContext : DbContext
+    where TEntity : class // => In implementation should be Entity<TKey>
 {
-    public interface IRepositoryBaseDbContext<TContext, TEntity, TKey>
-        where TContext : DbContext
-        where TEntity : class // => In implementation should be Entity<TKey>
-    {
-        Task<TEntity> FindByIdAsync(TKey id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);
+    Task<TEntity> FindByIdAsync(TKey id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);
 
-        Task<TEntity> FindSingleAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);
+    Task<TEntity> FindSingleAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);
 
-        IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includeProperties);
+    IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includeProperties);
 
-        void Add(TEntity entity);
+    void Add(TEntity entity);
 
-        void Update(TEntity entity);
+    void Update(TEntity entity);
 
-        void Remove(TEntity entity);
+    void Remove(TEntity entity);
 
-        void RemoveMultiple(List<TEntity> entities);
-    }
+    void RemoveMultiple(List<TEntity> entities);
 }
