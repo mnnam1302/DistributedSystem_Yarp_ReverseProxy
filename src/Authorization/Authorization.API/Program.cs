@@ -1,11 +1,11 @@
 using Authorization.API.DependencyInjection.Extensions;
-using Authorization.Persistence.DependencyInjection.Extensions;
 using Authorization.API.Middleware;
+using Authorization.Application.DependencyInjection.Extensions;
+using Authorization.Infrastructure.DependecyInjection.Extensions;
+using Authorization.Persistence.DependencyInjection.Extensions;
 using Carter;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Serilog;
-using Authorization.Infrastructure.DependecyInjection.Extensions;
-using Authorization.Application.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,8 +44,7 @@ builder.Host.ConfigureServices((context, services) =>
             options.SubstituteApiVersionInUrl = true;
         });
 
-    //builder.Services.AddJwtAuthenticationAPI(builder.Configuration); //=> VALIDATION AT SERVER ApiGateway
-
+    // builder.Services.AddJwtAuthenticationAPI(builder.Configuration); //=> VALIDATION AT SERVER ApiGateway
 
     // Application
     builder.Services.AddMediatRApplication();
@@ -57,14 +56,13 @@ builder.Host.ConfigureServices((context, services) =>
     builder.Services.AddRepositoryPersistence();
 
     // Infrastructure
+    //builder.AddOpenTelemetryInfrastructure();
     builder.Services.AddServicesInfrastructure();
     builder.Services.AddRedisInfrastructure(builder.Configuration);
-    //builder.AddOpenTelemetryInfrastructure();
 
     // Add Custom Middleware
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 });
-
 
 var app = builder.Build();
 
@@ -74,13 +72,14 @@ app.MapCarter();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+{
     app.UseSwaggerAPI();
+}
 
 //app.UseHttpsRedirection();
-
 // Should add Authentication and Authorization herre. Let's check again
-//app.UseAuthentication();
-//app.UseAuthorization();
+ //app.UseAuthentication();
+ //app.UseAuthorization();
 
 try
 {

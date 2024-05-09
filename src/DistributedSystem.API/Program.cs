@@ -10,7 +10,6 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Add Serilog
 Log.Logger = new LoggerConfiguration().ReadFrom
     .Configuration(builder.Configuration)
@@ -90,11 +89,9 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 // Add API endpoint with Carter module
 app.MapCarter(); // Must be after authentication and authorization
 
-
 // Configure the HTTP request pipeline.
 if (builder.Environment.IsDevelopment() || builder.Environment.IsStaging())
     app.UseSwaggerAPI(); // => After MapCarter => Show Version
-
 
 try
 {

@@ -1,15 +1,14 @@
 ﻿using MongoDB.Bson;
 
-namespace Query.Domain.Abstractions.Entities
+namespace Query.Domain.Abstractions.Entities;
+
+public abstract class Document : IDocument
 {
-    public abstract class Document : IDocument
-    {
-        public ObjectId Id { get; set; }
+    public ObjectId Id { get; set; }
 
-        public Guid DocumentId { get; set; }
+    public Guid DocumentId { get; set; }
 
-        public DateTimeOffset CreatedOnUtc => Id.CreationTime;
+    public DateTimeOffset CreatedOnUtc => Id.CreationTime;
 
-        public DateTimeOffset? ModifiedOnUtc { get; set; }
-    }
+    public DateTimeOffset? ModifiedOnUtc { get; set; }
 }

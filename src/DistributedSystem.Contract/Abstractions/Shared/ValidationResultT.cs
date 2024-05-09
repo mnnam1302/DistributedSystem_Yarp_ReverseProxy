@@ -1,13 +1,12 @@
-﻿namespace DistributedSystem.Contract.Abstractions.Shared
+﻿namespace DistributedSystem.Contract.Abstractions.Shared;
+
+public class ValidationResult<TValue> : Result<TValue>, IValidationResult
 {
-    public class ValidationResult<TValue> : Result<TValue>, IValidationResult
-    {
-        public ValidationResult(Error[] errors)
-            : base(default, false, IValidationResult.ValidationError)
-            => Errors = errors;
+    public ValidationResult(Error[] errors)
+        : base(default, false, IValidationResult.ValidationError)
+        => Errors = errors;
 
-        public Error[] Errors { get; }
+    public Error[] Errors { get; }
 
-        public static ValidationResult<TValue> WithErrors(Error[] errors) => new(errors);
-    }
+    public static ValidationResult<TValue> WithErrors(Error[] errors) => new (errors);
 }

@@ -80,7 +80,7 @@ internal sealed class ExceptionHandlingMiddleware : IMiddleware
 
     private static IReadOnlyCollection<Query.Application.Exceptions.ValidationError> GetErrors(Exception exception)
     {
-        IReadOnlyCollection<Query.Application.Exceptions.ValidationError> errors = null;
+        IReadOnlyCollection<Query.Application.Exceptions.ValidationError>? errors = null;
 
         if (exception is Query.Application.Exceptions.ValidationException validationException)
         {

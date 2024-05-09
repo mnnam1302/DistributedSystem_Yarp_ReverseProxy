@@ -19,11 +19,12 @@ public sealed class TransactionPipelineBehavior<TRequest, TResponse> : IPipeline
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        if (!IsCommand()) // In case TRequest is a QueryRequest just ignore
+        if (!TransactionPipelineBehavior<TRequest, TResponse>.IsCommand()) // In case TRequest is a QueryRequest just ignore
+        {
             return await next();
+        }
 
         #region ================= SQL-SERVER-STRATEGY-1 =================
-
         //// Use of an EF Core resiliency strategy when using multiple DbContexts within an explicit BeginTransaction():
         //// https://learn.microsoft.com/ef/core/miscellaneous/connection-resiliency
         var strategy = _context.Database.CreateExecutionStrategy();
@@ -41,7 +42,6 @@ public sealed class TransactionPipelineBehavior<TRequest, TResponse> : IPipeline
 
         #endregion ================= SQL-SERVER-STRATEGY-1 =================
 
-
         #region ================= SQL-SERVER-STRATEGY-2 =================
 
         //IMPORTANT: passing "TransactionScopeAsyncFlowOption.Enabled" to the TransactionScope constructor. This is necessary to be able to use it with async/await.
@@ -57,6 +57,6 @@ public sealed class TransactionPipelineBehavior<TRequest, TResponse> : IPipeline
         #endregion ================= SQL-SERVER-STRATEGY-2 =================
     }
 
-    private bool IsCommand()
+    private static bool IsCommand() 
         => typeof(TRequest).Name.EndsWith("Command");
 }

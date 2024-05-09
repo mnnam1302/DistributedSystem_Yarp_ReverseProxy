@@ -1,22 +1,21 @@
 ﻿using Authorization.Domain.Abstractions;
 
-namespace Authorization.Persistence
+namespace Authorization.Persistence;
+
+public class EFUnitOfWork : IUnitOfWork
 {
-    public class EFUnitOfWork : IUnitOfWork
+    private readonly ApplicationDbContext _dbContext;
+
+    public EFUnitOfWork(ApplicationDbContext dbContext)
     {
-        private readonly ApplicationDbContext _dbContext;
+        _dbContext = dbContext;
+    }
 
-        public EFUnitOfWork(ApplicationDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+    async ValueTask IAsyncDisposable.DisposeAsync()
+        => await _dbContext.DisposeAsync();
 
-        async ValueTask IAsyncDisposable.DisposeAsync()
-            => await _dbContext.DisposeAsync();
-
-        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
+    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

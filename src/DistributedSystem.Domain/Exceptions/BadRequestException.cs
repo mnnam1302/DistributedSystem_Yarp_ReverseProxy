@@ -1,10 +1,9 @@
-﻿namespace DistributedSystem.Domain.Exceptions
+﻿namespace DistributedSystem.Domain.Exceptions;
+
+public class BadRequestException : DomainException
 {
-    public class BadRequestException : DomainException
+    protected BadRequestException(string message)
+        : base("Bad Request", message)
     {
-        protected BadRequestException(string message)
-            : base("Bad Request", message)
-        {
-        }
     }
 }

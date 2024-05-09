@@ -3,38 +3,37 @@ using MediatR;
 using Query.Domain.Abstractions.Repositories;
 using Query.Domain.Entities;
 
-namespace Query.Infrastructure.Abstractions
+namespace Query.Infrastructure.Abstractions;
+
+public abstract class Consumer<TMessage> : IConsumer<TMessage>
+    where TMessage : class, DistributedSystem.Contract.Abstractions.Message.IDomainEvent
 {
-    public abstract class Consumer<TMessage> : IConsumer<TMessage>
-        where TMessage : class, DistributedSystem.Contract.Abstractions.Message.IDomainEvent
+    private readonly ISender _sender;
+    private readonly IMongoRepository<EventProjection> _eventRepository;
+
+    protected Consumer(ISender sender, IMongoRepository<EventProjection> eventRepository)
     {
-        private readonly ISender _sender;
-        private readonly IMongoRepository<EventProjection> _eventRepository;
+        _sender = sender;
+        _eventRepository = eventRepository;
+    }
 
-        protected Consumer(ISender sender, IMongoRepository<EventProjection> eventRepository)
+    public async Task Consume(ConsumeContext<TMessage> context)
+    {
+        // Find event projection by event id
+        var eventProjection = await _eventRepository.FindOneAsync(e => e.EventId == context.Message.IdEvent);
+
+        if (eventProjection is null)
         {
-            _sender = sender;
-            _eventRepository = eventRepository;
-        }
+            await _sender.Send(context.Message);
 
-        public async Task Consume(ConsumeContext<TMessage> context)
-        {
-            // Find event projection by event id
-            var eventProjection = await _eventRepository.FindOneAsync(e => e.EventId == context.Message.IdEvent);
-
-            if (eventProjection is null)
+            eventProjection = new EventProjection()
             {
-                await _sender.Send(context.Message);
+                EventId = context.Message.IdEvent,
+                Name = context.Message.GetType().Name,
+                Type = context.Message.GetType().Name
+            };
 
-                eventProjection = new EventProjection()
-                {
-                    EventId = context.Message.IdEvent,
-                    Name = context.Message.GetType().Name,
-                    Type = context.Message.GetType().Name
-                };
-
-                await _eventRepository.InsertOneAsync(eventProjection);
-            }
+            await _eventRepository.InsertOneAsync(eventProjection);
         }
     }
 }

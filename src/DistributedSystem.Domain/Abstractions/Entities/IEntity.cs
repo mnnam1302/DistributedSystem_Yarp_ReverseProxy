@@ -1,7 +1,6 @@
-﻿namespace DistributedSystem.Domain.Abstractions.Entities
+﻿namespace DistributedSystem.Domain.Abstractions.Entities;
+
+public interface IEntity<T>
 {
-    public interface IEntity<T>
-    {
-        T Id { get; set; }
-    }
+    T Id { get; set; }
 }

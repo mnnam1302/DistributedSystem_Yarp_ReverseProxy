@@ -1,13 +1,12 @@
-﻿namespace DistributedSystem.Domain.Exceptions
-{
-    public class DomainException : Exception
-    {
-        protected DomainException(string title, string message)
-            : base(message)
-        {
-            Title = title;
-        }
+﻿namespace DistributedSystem.Domain.Exceptions;
 
-        public string Title { get; }
+public class DomainException : Exception
+{
+    protected DomainException(string title, string message)
+        : base(message)
+    {
+        Title = title;
     }
+
+    public string Title { get; }
 }

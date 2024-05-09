@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using System.Diagnostics;
+using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace Authorization.Application.Behaviors;
 
@@ -26,7 +26,9 @@ public class PerformancePipelineBehavior<TRequest, TResponse> : IPipelineBehavio
         var elapsedMilliseconds = _timer.ElapsedMilliseconds;
 
         if (elapsedMilliseconds <= 5000)
+        {
             return response;
+        }
 
         var requestName = typeof(TRequest).Name;
         _logger.LogWarning("Long Time Running: Request Details: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}", requestName, elapsedMilliseconds, request);

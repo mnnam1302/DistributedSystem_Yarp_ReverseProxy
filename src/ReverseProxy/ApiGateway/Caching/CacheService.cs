@@ -1,55 +1,55 @@
-﻿using ApiGateway.Abstractions;
-using Microsoft.Extensions.Caching.Distributed;
 using System.Collections.Concurrent;
 using System.Text.Json;
+using ApiGateway.Abstractions;
+using Microsoft.Extensions.Caching.Distributed;
 
-namespace ApiGateway.Caching
+namespace ApiGateway.Caching;
+
+public class CacheService : ICacheService
 {
-    public class CacheService : ICacheService
+    private readonly IDistributedCache _distributedCache;
+
+    public CacheService(IDistributedCache distributedCache)
+        => _distributedCache = distributedCache;
+
+    private static readonly ConcurrentDictionary<string, bool> CacheKeys = new();
+
+    public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
+        where T : class
     {
-        private readonly IDistributedCache _distributedCache;
+        string? cacheValue = await _distributedCache.GetStringAsync(key, cancellationToken);
 
-        public CacheService(IDistributedCache distributedCache)
+        if (cacheValue is null)
         {
-            _distributedCache = distributedCache;
+            return null;
         }
 
-        private static ConcurrentDictionary<string, bool> CacheKeys = new ConcurrentDictionary<string, bool>();
+        T? value = JsonSerializer.Deserialize<T>(cacheValue);
+        return value;
+    }
 
-        public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class
-        {
-            string? cacheValue = await _distributedCache.GetStringAsync(key, cancellationToken);
+    public async Task SetAsync<T>(string key, T value, CancellationToken cancellationToken = default) where T : class
+    {
+        string cacheValue = JsonSerializer.Serialize(value);
 
-            if (cacheValue is null)
-                return null;
+        await _distributedCache.SetStringAsync(key, cacheValue, cancellationToken);
 
-            T? value = JsonSerializer.Deserialize<T>(cacheValue);
-            return value;
-        }
+        CacheKeys.TryAdd(key, true);
+    }
 
-        public async Task SetAsync<T>(string key, T value, CancellationToken cancellationToken = default) where T : class
-        {
-            string cacheValue = JsonSerializer.Serialize(value);
+    public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
+    {
+        await _distributedCache.RemoveAsync(key, cancellationToken);
 
-            await _distributedCache.SetStringAsync(key, cacheValue, cancellationToken);
+        CacheKeys.TryRemove(key, out bool _);
+    }
 
-            CacheKeys.TryAdd(key, true);
-        }
+    public async Task RemoveByPrefixAsync(string prefixKey, CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Task> tasks = CacheKeys.Keys
+            .Where(key => key.StartsWith(prefixKey))
+            .Select(key => RemoveAsync(key, cancellationToken));
 
-        public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
-        {
-            await _distributedCache.RemoveAsync(key, cancellationToken);
-
-            CacheKeys.TryRemove(key, out bool _);
-        }
-
-        public async Task RemoveByPrefixAsync(string prefixKey, CancellationToken cancellationToken = default)
-        {
-            IEnumerable<Task> tasks = CacheKeys.Keys
-                .Where(key => key.StartsWith(prefixKey))
-                .Select(key => RemoveAsync(key, cancellationToken));
-
-            await Task.WhenAll(tasks);
-        }
+        await Task.WhenAll(tasks);
     }
 }

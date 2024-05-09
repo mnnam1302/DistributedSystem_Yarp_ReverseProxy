@@ -14,8 +14,4 @@
     <ProjectReference Include="..\Query.Domain\Query.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DependencyInjection\Options\" />
-  </ItemGroup>
-
 </Project>

@@ -1,13 +1,12 @@
-﻿namespace DistributedSystem.Contract.Abstractions.Shared
+﻿namespace DistributedSystem.Contract.Abstractions.Shared;
+
+public sealed class ValidationResult : Result, IValidationResult
 {
-    public sealed class ValidationResult : Result, IValidationResult
-    {
-        private ValidationResult(Error[] errors)
-            : base(false, IValidationResult.ValidationError) =>
-            Errors = errors;
+    private ValidationResult(Error[] errors)
+        : base(false, IValidationResult.ValidationError) =>
+        Errors = errors;
 
-        public Error[] Errors { get; }
+    public Error[] Errors { get; }
 
-        public static ValidationResult WithErrors(Error[] errors) => new(errors);
-    }
+    public static ValidationResult WithErrors(Error[] errors) => new (errors);
 }

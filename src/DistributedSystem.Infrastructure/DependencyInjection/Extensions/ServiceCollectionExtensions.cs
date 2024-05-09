@@ -1,18 +1,16 @@
-﻿using DistributedSystem.Application.Abstractions;
+﻿using System.Reflection;
+using DistributedSystem.Application.Abstractions;
 using DistributedSystem.Contract.JsonConverters;
 using DistributedSystem.Infrastructure.Authentication;
 using DistributedSystem.Infrastructure.BackgroundJobs;
 using DistributedSystem.Infrastructure.Caching;
-using DistributedSystem.Infrastructure.DependecyInjection.Options;
 using DistributedSystem.Infrastructure.DependencyInjection.Options;
 using DistributedSystem.Infrastructure.PipelineObservers;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Quartz;
-using System.Reflection;
 
 namespace DistributedSystem.Infrastructure.DependencyInjection.Extensions;
 
@@ -60,13 +58,11 @@ public static class ServiceCollectionExtensions
                     h.Password(massTransitConfiguration.Password);
                 });
 
-                bus.UseMessageRetry(retry =>
-                {
-                    retry.Incremental(
+                bus.UseMessageRetry(retry 
+                    => retry.Incremental(
                         retryLimit: messageBusOptions.RetryLimit,
                         initialInterval: messageBusOptions.InitialInterval,
-                        intervalIncrement: messageBusOptions.IntervalIncrement);
-                });
+                        intervalIncrement: messageBusOptions.IntervalIncrement));
 
                 // I want to serialized when send message to RabbitMQ
                 // And deserialized when receive message from RabbitMQ
@@ -135,16 +131,14 @@ public static class ServiceCollectionExtensions
             // Mục đích: mỗi lần mình sẽ Push 20 message lên RabbitMQ
             configure
                 .AddJob<ProducerOutboxMessageJob>(jobKey)
-                .AddTrigger(trigger =>
-                {
-                    trigger.ForJob(jobKey)
-                    .WithSimpleSchedule(schedule =>
-                    {
-                        // Check lại Milisecond hay Microsecond - Trandong
-                        schedule.WithInterval(TimeSpan.FromMilliseconds(100));
-                        schedule.RepeatForever();
-                    });
-                });
+                .AddTrigger(trigger
+                    => trigger.ForJob(jobKey)
+                        .WithSimpleSchedule(schedule =>
+                        {
+                            // Check lại Milisecond hay Microsecond - Trandong
+                            schedule.WithInterval(TimeSpan.FromMilliseconds(100));
+                            schedule.RepeatForever();
+                        }));
 
             configure.UseMicrosoftDependencyInjectionJobFactory();
         });
@@ -158,118 +152,117 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(AssemblyReference.Assembly));
     }
 
+    //   <ItemGroup>
+    //	<PackageReference Include = "OpenTelemetry" Version="1.7.0" />
+    //	<PackageReference Include = "OpenTelemetry.Exporter.Console" Version="1.7.0" />
+    //	<PackageReference Include = "OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
+    //	<PackageReference Include = "OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
+    //	<PackageReference Include = "OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
+    //	<PackageReference Include = "OpenTelemetry.Instrumentation.Http" Version="1.7.1" />
+    //	<PackageReference Include = "OpenTelemetry.Instrumentation.Runtime" Version="1.7.0" />
+    //</ItemGroup>
+    //   public static WebApplicationBuilder AddOpenTelemetryInfrastructure(this WebApplicationBuilder builder)
+    //   {
+    //       var otlpOptions = new OtlpOptions();
+    //       builder.Configuration.GetSection(nameof(OtlpOptions)).Bind(otlpOptions);
 
- //   <ItemGroup>
-	//	<PackageReference Include = "OpenTelemetry" Version="1.7.0" />
-	//	<PackageReference Include = "OpenTelemetry.Exporter.Console" Version="1.7.0" />
-	//	<PackageReference Include = "OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
-	//	<PackageReference Include = "OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
-	//	<PackageReference Include = "OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
-	//	<PackageReference Include = "OpenTelemetry.Instrumentation.Http" Version="1.7.1" />
-	//	<PackageReference Include = "OpenTelemetry.Instrumentation.Runtime" Version="1.7.0" />
-	//</ItemGroup>
- //   public static WebApplicationBuilder AddOpenTelemetryInfrastructure(this WebApplicationBuilder builder)
- //   {
- //       var otlpOptions = new OtlpOptions();
- //       builder.Configuration.GetSection(nameof(OtlpOptions)).Bind(otlpOptions);
+    //       var resourceBuilder = ResourceBuilder.CreateDefault()
+    //              .AddService(serviceName: otlpOptions.ServiceName,
+    //                           serviceVersion: otlpOptions.ServiceVersion);
 
- //       var resourceBuilder = ResourceBuilder.CreateDefault()
- //              .AddService(serviceName: otlpOptions.ServiceName,
- //                           serviceVersion: otlpOptions.ServiceVersion);
+    //       var logExporter = otlpOptions.UseLogExporter.ToLowerInvariant();
+    //       // Logging
+    //       builder.Logging.AddOpenTelemetry(logging =>
+    //       {
+    //           // TODO: setup exporter here
+    //           logging.SetResourceBuilder(resourceBuilder);
+    //           switch (logExporter)
+    //           {
+    //               case "console":
+    //                   logging.AddConsoleExporter();
+    //                   break;
+    //               case "otlp":
+    //                   logging.SetResourceBuilder(ResourceBuilder.CreateDefault()
+    //                       .AddService(serviceName: otlpOptions.ServiceName,
+    //                                   serviceVersion: otlpOptions.ServiceVersion));
 
- //       var logExporter = otlpOptions.UseLogExporter.ToLowerInvariant();
- //       // Logging
- //       builder.Logging.AddOpenTelemetry(logging =>
- //       {
- //           // TODO: setup exporter here
- //           logging.SetResourceBuilder(resourceBuilder);
- //           switch (logExporter)
- //           {
- //               case "console":
- //                   logging.AddConsoleExporter();
- //                   break;
- //               case "otlp":
- //                   logging.SetResourceBuilder(ResourceBuilder.CreateDefault()
- //                       .AddService(serviceName: otlpOptions.ServiceName,
- //                                   serviceVersion: otlpOptions.ServiceVersion));
+    //                   logging.AddOtlpExporter(opt =>
+    //                       opt.Endpoint = new Uri(otlpOptions.Endpoint));
+    //                   break;
+    //               case "":
+    //               case "none":
+    //                   break;
+    //           }
+    //       });
 
- //                   logging.AddOtlpExporter(opt =>
- //                       opt.Endpoint = new Uri(otlpOptions.Endpoint));
- //                   break;
- //               case "":
- //               case "none":
- //                   break;
- //           }
- //       });
+    //       // Metrics
+    //       var metricsExporter = otlpOptions.UseMetricsExporter.ToLowerInvariant();
 
- //       // Metrics
- //       var metricsExporter = otlpOptions.UseMetricsExporter.ToLowerInvariant();
+    //       builder.Services.AddOpenTelemetry()
+    //           .WithMetrics(metrics =>
+    //           {
+    //               metrics.SetResourceBuilder(resourceBuilder)
+    //                   .AddRuntimeInstrumentation()
+    //                   .AddAspNetCoreInstrumentation()
+    //                   .AddHttpClientInstrumentation();
 
- //       builder.Services.AddOpenTelemetry()
- //           .WithMetrics(metrics =>
- //           {
- //               metrics.SetResourceBuilder(resourceBuilder)
- //                   .AddRuntimeInstrumentation()
- //                   .AddAspNetCoreInstrumentation()
- //                   .AddHttpClientInstrumentation();
+    //               switch (metricsExporter)
+    //               {
+    //                   case "console":
+    //                       metrics.AddConsoleExporter((exporterOptions, metricReaderOptions) =>
+    //                       {
+    //                           exporterOptions.Targets = ConsoleExporterOutputTargets.Console;
 
- //               switch (metricsExporter)
- //               {
- //                   case "console":
- //                       metrics.AddConsoleExporter((exporterOptions, metricReaderOptions) =>
- //                       {
- //                           exporterOptions.Targets = ConsoleExporterOutputTargets.Console;
+    //                           // The ConsoleMetricExporter defaults to a manual collect cycle.
+    //                           // This configuration causes metrics to be exported to stdout on a 10s interval.
+    //                           // metricReaderOptions.MetricReaderType = MetricReaderType.Periodic;
+    //                           metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 10000;
+    //                       });
+    //                       break;
+    //                   case "otlp":
+    //                       metrics.AddOtlpExporter(opt =>
+    //                           opt.Endpoint = new Uri(otlpOptions.Endpoint));
+    //                       break;
+    //                   case "":
+    //                   case "none":
+    //                       break;
+    //               }
+    //           });
 
- //                           // The ConsoleMetricExporter defaults to a manual collect cycle.
- //                           // This configuration causes metrics to be exported to stdout on a 10s interval.
- //                           // metricReaderOptions.MetricReaderType = MetricReaderType.Periodic;
- //                           metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 10000;
- //                       });
- //                       break;
- //                   case "otlp":
- //                       metrics.AddOtlpExporter(opt =>
- //                           opt.Endpoint = new Uri(otlpOptions.Endpoint));
- //                       break;
- //                   case "":
- //                   case "none":
- //                       break;
- //               }
- //           });
+    //       // Tracing
+    //       var tracingExporter = otlpOptions.UseTracingExporter.ToLowerInvariant();
 
- //       // Tracing
- //       var tracingExporter = otlpOptions.UseTracingExporter.ToLowerInvariant();
+    //       builder.Services.AddOpenTelemetry()
+    //           .WithTracing(tracing =>
+    //           {
+    //               tracing
+    //                   .SetResourceBuilder(resourceBuilder)
+    //                   .AddAspNetCoreInstrumentation()
+    //                   .AddHttpClientInstrumentation();
 
- //       builder.Services.AddOpenTelemetry()
- //           .WithTracing(tracing =>
- //           {
- //               tracing
- //                   .SetResourceBuilder(resourceBuilder)
- //                   .AddAspNetCoreInstrumentation()
- //                   .AddHttpClientInstrumentation();
+    //               switch (tracingExporter)
+    //               {
+    //                   case "console":
+    //                       tracing.AddConsoleExporter();
 
- //               switch (tracingExporter)
- //               {
- //                   case "console":
- //                       tracing.AddConsoleExporter();
+    //                       // For options which can be bound from IConfiguration
+    //                       builder.Services.Configure<AspNetCoreTraceInstrumentationOptions>(builder.Configuration.GetSection("AspNetCoreInstrumentation"));
 
- //                       // For options which can be bound from IConfiguration
- //                       builder.Services.Configure<AspNetCoreTraceInstrumentationOptions>(builder.Configuration.GetSection("AspNetCoreInstrumentation"));
+    //                       // For options which can be configured from code only
+    //                       builder.Services.Configure<AspNetCoreTraceInstrumentationOptions>(options =>
+    //                           options.Filter = _ => true);
 
- //                       // For options which can be configured from code only
- //                       builder.Services.Configure<AspNetCoreTraceInstrumentationOptions>(options =>
- //                           options.Filter = _ => true);
+    //                       break;
+    //                   case "otlp":
+    //                       tracing.AddOtlpExporter(otlpOtions =>
+    //                           otlpOtions.Endpoint = new Uri(otlpOptions.Endpoint));
+    //                       break;
+    //                   case "":
+    //                   case "none":
+    //                       break;
+    //               }
+    //           });
 
- //                       break;
- //                   case "otlp":
- //                       tracing.AddOtlpExporter(otlpOtions =>
- //                           otlpOtions.Endpoint = new Uri(otlpOptions.Endpoint));
- //                       break;
- //                   case "":
- //                   case "none":
- //                       break;
- //               }
- //           });
-
- //       return builder;
- //   }
+    //       return builder;
+    //   }
 }

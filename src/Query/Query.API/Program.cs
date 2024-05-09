@@ -2,10 +2,10 @@ using Carter;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Query.API.DependencyInjection.Extensions;
 using Query.API.Middleware;
-using Serilog;
-using Query.Persistence.DependencyInjection.Extensions;
-using Query.Infrastructure.DependencyInjection.Extensions;
 using Query.Application.DependencyInjection.Extensions;
+using Query.Infrastructure.DependencyInjection.Extensions;
+using Query.Persistence.DependencyInjection.Extensions;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,13 +43,10 @@ builder.Host.ConfigureServices((context, servies) =>
             options.SubstituteApiVersionInUrl = true;
         });
 
-
     builder.Services.AddMediatRApplication();
-
 
     builder.Services.AddServicesInfrastructure(builder.Configuration);
     builder.Services.AddMasstransitRabbitMQInfrastructure(builder.Configuration);
-
 
     // MongoDB
     builder.Services.AddServicesPersistence();
@@ -73,7 +70,9 @@ app.MapCarter();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+{
     app.UseSwaggerAPI(); // After MapCarter => Show Version
+}
 
 try
 {

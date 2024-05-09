@@ -1,16 +1,15 @@
-﻿using Newtonsoft.Json;
-using System.Globalization;
+﻿using System.Globalization;
+using Newtonsoft.Json;
 
-namespace DistributedSystem.Contract.JsonConverters
+namespace DistributedSystem.Contract.JsonConverters;
+
+public class DateOnlyJsonConverter : JsonConverter<DateOnly>
 {
-    public class DateOnlyJsonConverter : JsonConverter<DateOnly>
-    {
-        private const string Format = "dd/MM/yyyy";
+    private const string Format = "dd/MM/yyyy";
 
-        public override void WriteJson(JsonWriter writer, DateOnly value, JsonSerializer serialized)
-            => writer.WriteValue(value.ToString(Format, CultureInfo.InvariantCulture));
+    public override void WriteJson(JsonWriter writer, DateOnly value, JsonSerializer serialized)
+        => writer.WriteValue(value.ToString(Format, CultureInfo.InvariantCulture));
 
-        public override DateOnly ReadJson(JsonReader reader, Type objectType, DateOnly existingValue, bool hasExistingValue, JsonSerializer serializer)
-            => DateOnly.ParseExact(reader.Value as string ?? string.Empty, Format, CultureInfo.InvariantCulture);
-    }
+    public override DateOnly ReadJson(JsonReader reader, Type objectType, DateOnly existingValue, bool hasExistingValue, JsonSerializer serializer)
+        => DateOnly.ParseExact(reader.Value as string ?? string.Empty, Format, CultureInfo.InvariantCulture);
 }

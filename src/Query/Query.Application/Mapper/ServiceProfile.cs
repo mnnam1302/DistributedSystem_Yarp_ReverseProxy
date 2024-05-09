@@ -1,14 +1,11 @@
 ﻿using AutoMapper;
-using DistributedSystem.Contract.Services.V1.Product;
-using Query.Domain.Entities;
 
-namespace Query.Application.Mapper
+namespace Query.Application.Mapper;
+
+public class ServiceProfile : Profile
 {
-    public class ServiceProfile : Profile
+    public ServiceProfile()
     {
-        public ServiceProfile()
-        {
-            //CreateMap<ProductProjection, Response.ProductResponse>().ReverseMap();
-        }
+        //CreateMap<ProductProjection, Response.ProductResponse>().ReverseMap();
     }
 }

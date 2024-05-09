@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
 
-namespace DistributedSystem.Domain
+namespace DistributedSystem.Domain;
+
+public static class AssemblyReference
 {
-    public static class AssemblyReference
-    {
-        public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly;
-    }
+    public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly;
 }

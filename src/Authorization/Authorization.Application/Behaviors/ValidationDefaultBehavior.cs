@@ -30,13 +30,16 @@ public class ValidationDefaultBehavior<TRequest, TResponse> : IPipelineBehavior<
             .Select(x => x.FirstOrDefault())
             .ToList();
 
-        if (errorDictionary.Any())
+        // if (errorDictionary.Any())
+        if (errorDictionary.Count > 0)
+        {
             // Kiểm tra xem: Chúng ta có những cái rule, validation như người quản lý, họ sẽ check người đi vào
-            //request đi vào và người đi ra response
+            // request đi vào và người đi ra response
             // Sẽ có 2 option khi ông đi vào gặp lỗi:
             //      Gặp lỗi xử lý luôn
             //      Ném lỗi ra ngoài. Bên ngoài có một Middleware Global Exception Handler sẽ xử lý
             throw new ValidationException(errorDictionary);
+        }
 
         return await next();
     }

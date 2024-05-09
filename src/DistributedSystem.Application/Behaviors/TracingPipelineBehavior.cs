@@ -1,34 +1,33 @@
-﻿using MediatR;
+﻿using System.Diagnostics;
+using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
-namespace DistributedSystem.Application.Behaviors
+namespace DistributedSystem.Application.Behaviors;
+
+public class TracingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
 {
-    public class TracingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+    private readonly Stopwatch _timer;
+    private readonly ILogger<TRequest> _logger;
+
+    public TracingPipelineBehavior(ILogger<TRequest> logger)
     {
-        private readonly Stopwatch _timer;
-        private readonly ILogger<TRequest> _logger;
+        _timer = new Stopwatch();
+        _logger = logger;
+    }
 
-        public TracingPipelineBehavior(ILogger<TRequest> logger)
-        {
-            _timer = new Stopwatch();
-            _logger = logger;
-        }
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    {
+        // Log all request
+        _timer.Start();
+        var response = await next();
+        _timer.Stop();
 
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
-        { 
-            // Log all request
-            _timer.Start();
-            var response = await next();
-            _timer.Stop();
+        var elapsedMilliseconds = _timer.ElapsedMilliseconds;
+        var requestName = typeof(TRequest).Name;
+        _logger.LogInformation("Request Details: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}",
+                                              requestName, elapsedMilliseconds, request);
 
-            var elapsedMilliseconds = _timer.ElapsedMilliseconds;
-            var requestName = typeof(TRequest).Name;
-            _logger.LogInformation("Request Details: {Name} ({ElapsedMilliseconds} milliseconds) {@Request}",
-                                                  requestName, elapsedMilliseconds, request);
-
-            return response;
-        }
+        return response;
     }
 }

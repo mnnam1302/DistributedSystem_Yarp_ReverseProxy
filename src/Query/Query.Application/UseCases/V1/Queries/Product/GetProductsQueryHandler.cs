@@ -5,30 +5,29 @@ using MongoDB.Driver;
 using Query.Domain.Abstractions.Repositories;
 using Query.Domain.Entities;
 
-namespace Query.Application.UseCases.V1.Queries.Product
+namespace Query.Application.UseCases.V1.Queries.Product;
+
+public sealed class GetProductsQueryHandler : IQueryHandler<DistributedSystem.Contract.Services.V1.Product.Query.GetProductsQuery,
+        List<Response.ProductResponse>>
 {
-    public sealed class GetProductsQueryHandler : IQueryHandler<DistributedSystem.Contract.Services.V1.Product.Query.GetProductsQuery,
-            List<Response.ProductResponse>>
+    private readonly IMongoRepository<ProductProjection> _productRepository;
+
+    public GetProductsQueryHandler(IMongoRepository<ProductProjection> productRepository)
     {
-        private readonly IMongoRepository<ProductProjection> _productRepository;
+        _productRepository = productRepository;
+    }
 
-        public GetProductsQueryHandler(IMongoRepository<ProductProjection> productRepository)
+    public async Task<Result<List<Response.ProductResponse>>> Handle(DistributedSystem.Contract.Services.V1.Product.Query.GetProductsQuery request, CancellationToken cancellationToken)
+    {
+        var products = await _productRepository.AsQueryable().ToListAsync();
+
+        var result = new List<DistributedSystem.Contract.Services.V1.Product.Response.ProductResponse>();
+
+        foreach (var item in products)
         {
-            _productRepository = productRepository;
+            result.Add(new Response.ProductResponse(item.DocumentId, item.Name, item.Price, item.Description));
         }
 
-        public async Task<Result<List<Response.ProductResponse>>> Handle(DistributedSystem.Contract.Services.V1.Product.Query.GetProductsQuery request, CancellationToken cancellationToken)
-        {
-            var products = await _productRepository.AsQueryable().ToListAsync();
-
-            var result = new List<DistributedSystem.Contract.Services.V1.Product.Response.ProductResponse>();
-
-            foreach (var item in products)
-            {
-                result.Add(new Response.ProductResponse(item.DocumentId, item.Name, item.Price, item.Description));
-            }
-
-            return Result.Success(result);
-        }
+        return Result.Success(result);
     }
 }

@@ -16,8 +16,8 @@ public class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior
     }
 
     public async Task<TResponse> Handle(
-        TRequest request, 
-        RequestHandlerDelegate<TResponse> next, 
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         if (!_validators.Any())
@@ -35,7 +35,7 @@ public class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior
             .Distinct()
             .ToArray();
 
-        if (errors.Any())
+        if (errors.Length != 0)
         {
             // Return a validation result, not throwing an exception
             return CreateValidationResult<TResponse>(errors);
@@ -53,13 +53,10 @@ public class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior
         }
 
         // Read more: https://learn.microsoft.com/en-us/dotnet/api/system.type.makegenerictype?view=net-8.0#system-type-makegenerictype(system-type())
-
-        //object validationResult = typeof(ValidationResult)
+        // object validationResult = typeof(ValidationResult)
         //    .GetGenericTypeDefinition()
         //    .MakeGenericType(typeof(TResult).GenericTypeArguments[0])
         //    .GetMethod(nameof(ValidationResult.WithErrors)) !
-        //    .Invoke(null, new object[] { errors }) !;
-
         object validationResult = typeof(ValidationResult<>)
             .GetGenericTypeDefinition()
             .MakeGenericType(typeof(TResult).GenericTypeArguments[0])

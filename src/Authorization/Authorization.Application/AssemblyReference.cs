@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
 
-namespace Authorization.Application
+namespace Authorization.Application;
+
+public static class AssemblyReference
 {
-    public class AssemblyReference
-    {
-        public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly;
-    }
+    public static readonly Assembly Assembly = typeof(AssemblyReference).Assembly;
 }

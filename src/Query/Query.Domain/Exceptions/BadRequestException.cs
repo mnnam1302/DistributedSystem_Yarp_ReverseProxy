@@ -1,10 +1,9 @@
-﻿namespace Query.Domain.Exceptions
+﻿namespace Query.Domain.Exceptions;
+
+public class BadRequestException : DomainException
 {
-    public class BadRequestException : DomainException
+    public BadRequestException(string message)
+        : base("Bad Request", message)
     {
-        public BadRequestException(string message)
-            : base("Bad Request", message)
-        {
-        }
     }
 }

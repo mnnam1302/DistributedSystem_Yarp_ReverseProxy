@@ -1,13 +1,12 @@
-﻿namespace DistributedSystem.Persistence.Constants
+﻿namespace DistributedSystem.Persistence.Constants;
+
+internal static class TableNames
 {
-    internal class TableNames
-    {
-        // ***************** Plural Nouns *****************
+    // ***************** Plural Nouns *****************
 
-        // For Outbox Pattern
-        internal const string OutboxMessages = nameof(OutboxMessages);
+    // For Outbox Pattern
+    internal const string OutboxMessages = nameof(OutboxMessages);
 
-        // ***************** Singular Nouns *****************
-        internal const string Product = nameof(Product);
-    }
+    // ***************** Singular Nouns *****************
+    internal const string Product = nameof(Product);
 }
