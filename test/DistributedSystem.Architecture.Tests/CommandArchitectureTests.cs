@@ -12,7 +12,6 @@ public class CommandArchitectureTests
     private const string PresentationNamespace = "DistributedSystem.Presentation";
     private const string ApiNamespace = "DistributedSystem.API";
 
-
     /// <summary>
     /// Domain should not have any dependency on other projects
     /// </summary>

@@ -2,59 +2,59 @@ version: "3.9"
 
 services:
   # SQL Server
-  # sqlserver:
-  #   container_name: yarp-sqlserver
-  #   image: mcr.microsoft.com/mssql/server:2019-latest
-  #   environment:
-  #     - ACCEPT_EULA=Y
-  #     - SA_PASSWORD=Sa1302139@
-  #   ports:
-  #     - "1434:1433"
-  #   restart: always
-  #   mem_limit: 12g
-  #   memswap_limit: 13g
-  #   networks:
-  #     - yarprevereseproxy_default
+  sqlserver:
+    container_name: sqlserver
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Sa1302139@
+    ports:
+      - "1434:1433"
+    restart: always
+    mem_limit: 12g
+    memswap_limit: 13g
+    networks:
+      - revereseproxy-network
 
   # Redis
   redis:
-    container_name: yarp-redis
+    container_name: redis
     image: redis:latest
     ports:
       - "6379:6379"
     networks:
-      - yarprevereseproxy_default
+      - revereseproxy-network
 
   # MongoDB
-  # mongo:
-  #   image: mongo
-  #   container_name: yarp-mongo
-  #   ports:
-  #     - "27018:27017"
-  #   restart: always
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: sa
-  #     MONGO_INITDB_ROOT_PASSWORD: sa1302139
-  #   networks:
-  #     - yarprevereseproxy_default
+  mongo:
+    image: mongo:5.0.14
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: sa
+      MONGO_INITDB_ROOT_PASSWORD: sa1302139
+    networks:
+      - revereseproxy-network
 
   # Mongo Express
   # mongo-express:
   #   image: mongo-express
   #   container_name: yarp-mongo-express
   #   ports:
-  #     - "8082:8081"
+  #     - "8080:8080"
   #   restart: always
   #   environment:
   #     ME_CONFIG_MONGODB_ADMINUSERNAME: sa
   #     ME_CONFIG_MONGODB_ADMINPASSWORD: sa1302139
   #     ME_CONFIG_MONGODB_URL: mongodb://sa:sa1302139@mongo:27017/
   #   networks:
-  #     - yarprevereseproxy_default
+  #     - revereseproxy-network
 
   # RabbitMQ
   rabbitmq:
-    container_name: yarp-rabbitmq
+    container_name: rabbitmq
     image: rabbitmq:3-management-alpine
     healthcheck:
       test: rabbitmq-diagnostics -q ping
@@ -69,10 +69,11 @@ services:
       RABBITMQ_DEFAULT_PASS: "guest"
       RABBITMQ_DEFAULT_VHOST: "nhatnam1302"
     networks:
-      - yarprevereseproxy_default
+      - revereseproxy-network
+
   # Seq
   seq:
-     container_name: yarp-seq
+     container_name: seq
      image: datalust/seq:latest
      ports:
         - 5341:5341
@@ -80,10 +81,88 @@ services:
      environment:
         ACCEPT_EULA: Y
      networks:
-        - yarprevereseproxy_default
+        - revereseproxy-network
+
+  # Jaeger
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14250:14250"
+      - "14268:14268"
+      - "14269:14269"
+      - "9411:9411" 
+    networks:
+      - revereseproxy-network
+
+  ##################################
+  authorization:
+     container_name: authorization
+     image: authorization:latest
+     build:
+         context: .
+         dockerfile: ./src/Authorization/Authorization.API/Dockerfile
+     # depends_on:
+     #    - seq
+     #    - redis
+     ports:
+        - 2000:80
+     restart: always
+     networks:
+        - revereseproxy-network
+
+  apigateway:
+     container_name: apigateway
+     image: apigateway:latest
+     build:
+         context: .
+         dockerfile: ./src/ReverseProxy/ApiGateway/Dockerfile
+     # depends_on:
+     #    - seq
+     #    - redis
+     ports:
+         - 5000:80
+     restart: always
+     networks:
+         - revereseproxy-network
+
+#  command:
+#      container_name: command
+#      image: command:latest
+#      build:
+#          context: .
+#          dockerfile: ./src/DistributedSystem.API/Dockerfile
+#      # depends_on:
+#      #    - seq
+#      #    - redis
+#      ports:
+#          - 3000:80
+#      restart: always
+#      networks:
+#          - revereseproxy-network
+
+  query:
+      container_name: query
+      image: query:latest
+      build:
+          context: .
+          dockerfile: ./src/Query/Query.API/Dockerfile
+      # depends_on:
+      #    - seq
+      #    - redis
+      ports:
+          - 4000:80
+      restart: always
+      networks:
+          - revereseproxy-network
 
 networks:
-  yarprevereseproxy_default:
+  revereseproxy-network:
 
     # Jaeger
     # jaeger-all-in-one:
@@ -103,7 +182,7 @@ networks:
     #     ports:
     #         - "9411:9411"
     #     networks:
-    #         - yarprevereseproxy_default
+    #         - revereseproxy-network
     
     # Collector
     # otel-collector:
@@ -124,7 +203,7 @@ networks:
     #         - jaeger-all-in-one
     #         - zipkin-all-in-one
     #     networks:
-    #         - yarprevereseproxy_default
+    #         - revereseproxy-network
     
     # Prometheus
     # prometheus:
@@ -135,7 +214,7 @@ networks:
     #     ports:
     #         - "9090:9090"
     #     networks:
-    #         - yarprevereseproxy_default
+    #         - revereseproxy-network
 
 #   # elk
 #   elk:
@@ -145,7 +224,7 @@ networks:
 #           - "9200:9200"
 #           - "5044:5044"
 #       networks:
-#           - distributed-systems
+#           - revereseproxy-network
  
 # networks:
-#     yarprevereseproxy_default:
+#     revereseproxy-network:
