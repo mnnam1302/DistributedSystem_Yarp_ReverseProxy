@@ -12,7 +12,6 @@ public class QueryArchitectureTests
     private const string PresentationNamespace = "Query.Presentation";
     private const string ApiNamespace = "Query.API";
 
-
     /// <summary>
     /// Domain should not have any dependency on other projects
     /// </summary>

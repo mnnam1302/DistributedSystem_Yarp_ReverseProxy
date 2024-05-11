@@ -17,7 +17,7 @@ public class UserApi : ApiEndpoint, ICarterModule
         var group1 = app.NewVersionedApi("users")
             .MapGroup(BaseUrl).HasApiVersion(1);
 
-        group1.MapPost("", CreateUsersV1);
+        group1.MapPost(string.Empty, CreateUsersV1);
         group1.MapPut("", UpdateUsersV1);
         group1.MapDelete("", DeleteUsersV1);
 
