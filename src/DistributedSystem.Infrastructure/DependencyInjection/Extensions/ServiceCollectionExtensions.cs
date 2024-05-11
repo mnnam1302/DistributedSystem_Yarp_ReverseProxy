@@ -4,12 +4,15 @@ using DistributedSystem.Contract.JsonConverters;
 using DistributedSystem.Infrastructure.Authentication;
 using DistributedSystem.Infrastructure.BackgroundJobs;
 using DistributedSystem.Infrastructure.Caching;
+using DistributedSystem.Infrastructure.DependecyInjection.Options;
 using DistributedSystem.Infrastructure.DependencyInjection.Options;
 using DistributedSystem.Infrastructure.PipelineObservers;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Quartz;
 
 namespace DistributedSystem.Infrastructure.DependencyInjection.Extensions;
@@ -150,6 +153,27 @@ public static class ServiceCollectionExtensions
     {
         // Tại sao ở đây lại có thêm Validator => MesssageBusOptions có các ràng buộc
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(AssemblyReference.Assembly));
+    }
+
+    public static IServiceCollection AddOpenTelemetryInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        var otlpOptions = new OtlpOptions();
+        configuration.GetSection(nameof(OtlpOptions)).Bind(otlpOptions);
+
+        services
+            .AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService(otlpOptions.ServiceName))
+            .WithTracing(tracing =>
+            {
+                tracing
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+
+                tracing.AddOtlpExporter(opt =>
+                    opt.Endpoint = new Uri(otlpOptions.Endpoint));
+            });
+
+        return services;
     }
 
     //   <ItemGroup>

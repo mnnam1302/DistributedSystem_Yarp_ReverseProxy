@@ -1,10 +1,13 @@
 ﻿using Authorization.Application.Abstractions;
 using Authorization.Infrastructure.Authentication;
 using Authorization.Infrastructure.Caching;
+using Authorization.Infrastructure.DependecyInjection.Options;
 using Authorization.Infrastructure.Encryption;
 using Authorization.Infrastructure.PasswordHasher;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace Authorization.Infrastructure.DependecyInjection.Extensions;
 
@@ -27,15 +30,27 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    //   <ItemGroup>
-    //	<PackageReference Include = "OpenTelemetry" Version="1.7.0" />
-    //	<PackageReference Include = "OpenTelemetry.Exporter.Console" Version="1.7.0" />
-    //	<PackageReference Include = "OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
-    //	<PackageReference Include = "OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
-    //	<PackageReference Include = "OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
-    //	<PackageReference Include = "OpenTelemetry.Instrumentation.Http" Version="1.7.1" />
-    //	<PackageReference Include = "OpenTelemetry.Instrumentation.Runtime" Version="1.7.0" />
-    //</ItemGroup>
+    public static IServiceCollection AddOpenTelemetryInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        var otlpOptions = new OtlpOptions();
+        configuration.GetSection(nameof(OtlpOptions)).Bind(otlpOptions);
+
+        services
+            .AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService(otlpOptions.ServiceName))
+            .WithTracing(tracing =>
+            {
+                tracing
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+
+                tracing.AddOtlpExporter(opt =>
+                    opt.Endpoint = new Uri(otlpOptions.Endpoint));
+            });
+
+        return services;
+    }
+
     //public static WebApplicationBuilder AddOpenTelemetryInfrastructure(this WebApplicationBuilder builder)
     //{
     //    var otlpOptions = new OtlpOptions();
@@ -69,7 +84,7 @@ public static class ServiceCollectionExtensions
     //                break;
     //        }
     //    });
-
+    //
     //    // Metrics
     //    var metricsExporter = otlpOptions.UseMetricsExporter.ToLowerInvariant();
 

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Query.Domain.Abstractions.Options;
 using Query.Infrastructure.DependencyInjection.Options;
 using Query.Infrastructure.PipelineObservers;
@@ -46,7 +48,7 @@ public static class ServiceCollectionExtension
                     h.Password(massTransitConfiguration.Password);
                 });
 
-                bus.UseMessageRetry(retry 
+                bus.UseMessageRetry(retry
                     => retry.Incremental(
                         retryLimit: messageBusOptions.RetryLimit,
                         initialInterval: messageBusOptions.InitialInterval,
@@ -104,6 +106,27 @@ public static class ServiceCollectionExtension
                 bus.ConfigureEndpoints(context);
             });
         });
+
+        return services;
+    }
+
+    public static IServiceCollection AddOpenTelemetryInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        var otlpOptions = new OtlpOptions();
+        configuration.GetSection(nameof(OtlpOptions)).Bind(otlpOptions);
+
+        services
+            .AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService(otlpOptions.ServiceName))
+            .WithTracing(tracing =>
+            {
+                tracing
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+
+                tracing.AddOtlpExporter(opt =>
+                    opt.Endpoint = new Uri(otlpOptions.Endpoint));
+            });
 
         return services;
     }

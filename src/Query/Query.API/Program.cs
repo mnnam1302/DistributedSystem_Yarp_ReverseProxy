@@ -45,14 +45,12 @@ builder.Host.ConfigureServices((context, servies) =>
 
     builder.Services.AddMediatRApplication();
 
-    builder.Services.AddServicesInfrastructure(builder.Configuration);
-    builder.Services.AddMasstransitRabbitMQInfrastructure(builder.Configuration);
+    builder.Services.AddServicesInfrastructure(context.Configuration);
+    builder.Services.AddMasstransitRabbitMQInfrastructure(context.Configuration);
 
-    // MongoDB
     builder.Services.AddServicesPersistence();
 
-    // OpenTelemetry
-    //builder.AddOpenTelemetryInfrastructure();
+    builder.Services.AddOpenTelemetryInfrastructure(context.Configuration);
 
     // Global Exception Handler
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();

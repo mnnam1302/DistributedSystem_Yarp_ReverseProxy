@@ -87,8 +87,8 @@ services:
         - revereseproxy-network
 
   # Jaeger
-  jaeger:
-    container_name: jaeger
+  jaeger-all-in-one:
+    container_name: jaeger-all-in-one
     image: jaegertracing/all-in-one:latest
     ports:
       - "5775:5775/udp"
@@ -103,68 +103,23 @@ services:
     networks:
       - revereseproxy-network
 
-  ##################################
-#  authorization:
-#     container_name: authorization
-#     image: authorization:latest
-#     build:
-#         context: .
-#         dockerfile: ./src/Authorization/Authorization.API/Dockerfile
-#     # depends_on:
-#     #    - seq
-#     #    - redis
-#     ports:
-#        - 2000:80
-#     restart: always
-#     networks:
-#        - revereseproxy-network
-
-#  apigateway:
-#     container_name: apigateway
-#     image: apigateway:latest
-#     build:
-#         context: .
-#         dockerfile: ./src/ReverseProxy/ApiGateway/Dockerfile
-#     # depends_on:
-#     #    - seq
-#     #    - redis
-#     ports:
-#         - 5000:80
-#     restart: always
-#     networks:
-#         - revereseproxy-network
-
-#  command:
-#     container_name: command
-#     image: command:latest
-#     build:
-#         context: .
-#         dockerfile: ./src/DistributedSystem.API/Dockerfile
-#     depends_on:
-#        - sqlserver
-#        - seq
-#        - redis
-#     ports:
-#         - 3000:80
-#     restart: always
-#     networks:
-#         - revereseproxy-network
-
-#  query:
-#      container_name: query
-#      image: query:latest
-#      build:
-#          context: .
-#          dockerfile: ./src/Query/Query.API/Dockerfile
-#      # depends_on:
-#      #    - mongodb
-#      #    - seq
-#      #    - redis
-#      ports:
-#          - 4000:80
-#      restart: always
-#      networks:
-#          - revereseproxy-network
+  # Collector
+  otel-collector:
+     image: otel/opentelemetry-collector-contrib:0.64.1
+     container_name: otel-collector
+     restart: always
+     command: ["--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}"]
+     volumes:
+         - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+     ports:
+         - "1888:1888"   # pprof extension
+         - "13133:13133" # health_check extension
+         - "4317:4317"   # OTLP gRPC receiver
+         - "55679:55679" # zpages extension
+     depends_on:
+         - jaeger-all-in-one
+     networks:
+         - revereseproxy-network
 
 networks:
   revereseproxy-network:

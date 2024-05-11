@@ -8,10 +8,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution 
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
 		docker-compose.Development.Infrastructure.yaml = docker-compose.Development.Infrastructure.yaml
-		otel-collector-config.yaml = otel-collector-config.yaml
-		docker-compose.Staging.Services.yaml = docker-compose.Staging.Services.yaml
 		docker-compose.Staging.Infrastructure.yaml = docker-compose.Staging.Infrastructure.yaml
-		prometheus.yaml = prometheus.yaml
+		docker-compose.Staging.Services.yaml = docker-compose.Staging.Services.yaml
+		otel-collector-config.yaml = otel-collector-config.yaml
 		README.md = README.md
 	EndProjectSection
 EndProject
