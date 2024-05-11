@@ -57,16 +57,16 @@ builder.Host.ConfigureServices((context, services) =>
     builder.Services.AddAutoMapperApplication();
 
     // Infrastructure
-    builder.Services.AddMasstransitRabbitMQInfrastructure(builder.Configuration);
+    builder.Services.AddMasstransitRabbitMQInfrastructure(context.Configuration);
     builder.Services.AddQuartzInfrastructure();
     builder.Services.AddMediatRInfrastructure();
     builder.Services.AddServicesInfrastructure();
-    builder.Services.AddRedisInfrastructure(builder.Configuration);
-    //builder.AddOpenTelemetryInfrastructure();
+    builder.Services.AddRedisInfrastructure(context.Configuration);
+    builder.Services.AddOpenTelemetryInfrastructure(context.Configuration);
 
     // Persustence
     builder.Services.AddInterceptorPersistence();
-    builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection(nameof(SqlServerRetryOptions)));
+    builder.Services.ConfigureSqlServerRetryOptionsPersistence(context.Configuration.GetSection(nameof(SqlServerRetryOptions)));
     builder.Services.AddSqlPersistence();
     builder.Services.AddRepositoryPersistence();
 

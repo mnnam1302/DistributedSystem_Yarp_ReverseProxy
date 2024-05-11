@@ -65,7 +65,7 @@ csharp_style_expression_bodied_operators = true:error
 csharp_style_expression_bodied_properties = true:error
 csharp_style_expression_bodied_indexers = true:error
 csharp_style_expression_bodied_accessors = true:error
-csharp_style_expression_bodied_lambdas = true:error
+csharp_style_expression_bodied_lambdas = true:warning
 csharp_style_expression_bodied_local_functions = true:error
 
 # IDE0008: Use explicit type
@@ -101,7 +101,7 @@ csharp_style_var_when_type_is_apparent = true:suggestion
 csharp_style_expression_bodied_accessors = true:error
 csharp_style_expression_bodied_constructors = false:silent
 csharp_style_expression_bodied_indexers = true:error
-csharp_style_expression_bodied_lambdas = true:error
+csharp_style_expression_bodied_lambdas = true:warning
 csharp_style_expression_bodied_local_functions = true:error
 csharp_style_expression_bodied_methods = false:silent
 csharp_style_expression_bodied_operators = true:error

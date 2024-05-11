@@ -20,7 +20,7 @@ builder.Host.UseSerilog();
 
 builder.Host.ConfigureServices((context, services) =>
 {
-    //Add services
+    // Add services
     builder.Host.ConfigureServices((context, services) =>
     {
         // Add Rate Limiter
@@ -36,9 +36,9 @@ builder.Host.ConfigureServices((context, services) =>
         builder.Services.AddRedisApiGateway(context.Configuration);
 
         // Add OpenTelemetry
-        //builder.AddOpenTelemetryInfrastructure();
+        builder.Services.AddOpenTelemetryInfrastructure(context.Configuration);
 
-        services.AddHttpLogging(options
+        services.AddHttpLogging(options 
             => options.LoggingFields = HttpLoggingFields.All);
     });
 });

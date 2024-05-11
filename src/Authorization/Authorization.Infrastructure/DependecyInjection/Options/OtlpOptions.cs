@@ -1,16 +1,10 @@
 ﻿namespace Authorization.Infrastructure.DependecyInjection.Options;
 
-public class OtlpOptions
+public record OtlpOptions
 {
-    public string UseTracingExporter { get; set; }
+    public string ServiceName { get; init; }
 
-    public string UseMetricsExporter { get; set; }
+    public string ServiceVersion { get; init; }
 
-    public string UseLogExporter { get; set; }
-
-    public string ServiceName { get; set; }
-
-    public string ServiceVersion { get; set; }
-
-    public string Endpoint { get; set; }
+    public string Endpoint { get; init; }
 }

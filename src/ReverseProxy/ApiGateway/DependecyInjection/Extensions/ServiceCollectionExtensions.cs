@@ -1,5 +1,8 @@
 using ApiGateway.Abstractions;
 using ApiGateway.Caching;
+using ApiGateway.DependecyInjection.Options;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace ApiGateway.DependecyInjection.Extensions;
 
@@ -19,15 +22,27 @@ public static class ServiceCollectionExtensions
             options.Configuration = connectionString;
         });
 
-    //   <ItemGroup>
-    //	<PackageReference Include = "OpenTelemetry" Version="1.7.0" />
-    //	<PackageReference Include = "OpenTelemetry.Exporter.Console" Version="1.7.0" />
-    //	<PackageReference Include = "OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
-    //	<PackageReference Include = "OpenTelemetry.Extensions.Hosting" Version="1.7.0" />
-    //	<PackageReference Include = "OpenTelemetry.Instrumentation.AspNetCore" Version="1.7.1" />
-    //	<PackageReference Include = "OpenTelemetry.Instrumentation.Http" Version="1.7.1" />
-    //	<PackageReference Include = "OpenTelemetry.Instrumentation.Runtime" Version="1.7.0" />
-    //</ItemGroup>
+    public static IServiceCollection AddOpenTelemetryInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    {
+        var otlpOptions = new OtlpOptions();
+        configuration.GetSection(nameof(OtlpOptions)).Bind(otlpOptions);
+
+        services
+            .AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService(otlpOptions.ServiceName))
+            .WithTracing(tracing =>
+            {
+                tracing
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
+
+                tracing.AddOtlpExporter(opt =>
+                    opt.Endpoint = new Uri(otlpOptions.Endpoint));
+            });
+
+        return services;
+    }
+
     //   public static WebApplicationBuilder AddOpenTelemetryInfrastructure(this WebApplicationBuilder builder)
     //   {
     //       var otlpOptions = new OtlpOptions();

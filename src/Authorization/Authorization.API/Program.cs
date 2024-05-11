@@ -51,14 +51,14 @@ builder.Host.ConfigureServices((context, services) =>
     builder.Services.AddAutoMapperApplication();
 
     // Persistence
-    builder.Services.ConfigureSqlServerRetryOptionsPersistence(builder.Configuration.GetSection("SqlServerRetryOptions"));
-    builder.Services.AddSqlPersistence(builder.Configuration);
+    builder.Services.ConfigureSqlServerRetryOptionsPersistence(context.Configuration.GetSection("SqlServerRetryOptions"));
+    builder.Services.AddSqlPersistence(context.Configuration);
     builder.Services.AddRepositoryPersistence();
 
     // Infrastructure
-    //builder.AddOpenTelemetryInfrastructure();
+    builder.Services.AddOpenTelemetryInfrastructure(context.Configuration);
     builder.Services.AddServicesInfrastructure();
-    builder.Services.AddRedisInfrastructure(builder.Configuration);
+    builder.Services.AddRedisInfrastructure(context.Configuration);
 
     // Add Custom Middleware
     builder.Services.AddTransient<ExceptionHandlingMiddleware>();
