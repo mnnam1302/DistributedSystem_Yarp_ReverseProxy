@@ -9,15 +9,6 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:3000"
-    },
-    "Docker": {
-      "commandName": "Docker",
-      "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
-      "environmentVariables": {
-        "ASPNETCORE_URLS": "http://+:80"
-      },
-      "publishAllPorts": true
     }
   }
 }

@@ -1,5 +1,8 @@
 version: "3.9"
 
+# networks:
+#   revereseproxy-network:
+
 services:
   # SQL Server
   sqlserver:
@@ -9,7 +12,7 @@ services:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=Sa1302139@
     ports:
-      - "1434:1433"
+      - "1433:1433"
     restart: always
     mem_limit: 12g
     memswap_limit: 13g
@@ -101,65 +104,67 @@ services:
       - revereseproxy-network
 
   ##################################
-  authorization:
-     container_name: authorization
-     image: authorization:latest
-     build:
-         context: .
-         dockerfile: ./src/Authorization/Authorization.API/Dockerfile
-     # depends_on:
-     #    - seq
-     #    - redis
-     ports:
-        - 2000:80
-     restart: always
-     networks:
-        - revereseproxy-network
+#  authorization:
+#     container_name: authorization
+#     image: authorization:latest
+#     build:
+#         context: .
+#         dockerfile: ./src/Authorization/Authorization.API/Dockerfile
+#     # depends_on:
+#     #    - seq
+#     #    - redis
+#     ports:
+#        - 2000:80
+#     restart: always
+#     networks:
+#        - revereseproxy-network
 
-  apigateway:
-     container_name: apigateway
-     image: apigateway:latest
-     build:
-         context: .
-         dockerfile: ./src/ReverseProxy/ApiGateway/Dockerfile
-     # depends_on:
-     #    - seq
-     #    - redis
-     ports:
-         - 5000:80
-     restart: always
-     networks:
-         - revereseproxy-network
+#  apigateway:
+#     container_name: apigateway
+#     image: apigateway:latest
+#     build:
+#         context: .
+#         dockerfile: ./src/ReverseProxy/ApiGateway/Dockerfile
+#     # depends_on:
+#     #    - seq
+#     #    - redis
+#     ports:
+#         - 5000:80
+#     restart: always
+#     networks:
+#         - revereseproxy-network
 
 #  command:
-#      container_name: command
-#      image: command:latest
+#     container_name: command
+#     image: command:latest
+#     build:
+#         context: .
+#         dockerfile: ./src/DistributedSystem.API/Dockerfile
+#     depends_on:
+#        - sqlserver
+#        - seq
+#        - redis
+#     ports:
+#         - 3000:80
+#     restart: always
+#     networks:
+#         - revereseproxy-network
+
+#  query:
+#      container_name: query
+#      image: query:latest
 #      build:
 #          context: .
-#          dockerfile: ./src/DistributedSystem.API/Dockerfile
+#          dockerfile: ./src/Query/Query.API/Dockerfile
 #      # depends_on:
+#      #    - mongodb
 #      #    - seq
 #      #    - redis
 #      ports:
-#          - 3000:80
+#          - 4000:80
 #      restart: always
 #      networks:
 #          - revereseproxy-network
-
-  query:
-      container_name: query
-      image: query:latest
-      build:
-          context: .
-          dockerfile: ./src/Query/Query.API/Dockerfile
-      # depends_on:
-      #    - seq
-      #    - redis
-      ports:
-          - 4000:80
-      restart: always
-      networks:
-          - revereseproxy-network
 
 networks:
   revereseproxy-network:

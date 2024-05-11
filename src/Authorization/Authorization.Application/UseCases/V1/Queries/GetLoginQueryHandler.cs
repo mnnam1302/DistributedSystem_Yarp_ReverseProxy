@@ -20,7 +20,7 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
     private readonly ApplicationDbContext _dbContext;
 
     public GetLoginQueryHandler(
-        IJwtTokenService jwtTokenService, 
+        IJwtTokenService jwtTokenService,
         ICacheService cacheService,
         IPasswordHasherService passwordHasherService,
         IRepositoryBase<AppUser, Guid> userRepository,
@@ -62,7 +62,7 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
          * PrivateKey => Generate Access Token - Correct
          * PrivateKey => Generate Access Token => Error => Correct
          * PublicKet => Verify Access Token - Correct
-         * 
+         *
          * Problem:
          * PrivateKey => Verify Access Token => Error
          */
