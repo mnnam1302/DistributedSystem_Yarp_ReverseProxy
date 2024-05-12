@@ -51,7 +51,7 @@ public static class JwtExtensions
             options.EventsType = typeof(CustomJwtBearerEvents);
         });
 
-        services.AddAuthorization(options 
+        services.AddAuthorization(options
             => options.AddPolicy("authPolicy", policy => policy.RequireAuthenticatedUser()));
 
         services.AddScoped<CustomJwtBearerEvents>();

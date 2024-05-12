@@ -16,28 +16,25 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
     private readonly ICacheService _cacheService;
     private readonly IPasswordHasherService _passwordHasherService;
     private readonly IRepositoryBase<AppUser, Guid> _userRepository;
-    private readonly IEncryptService _encryptService;
-    private readonly ApplicationDbContext _dbContext;
+    private readonly IRSAKeyGenerator _encryptService;
 
     public GetLoginQueryHandler(
         IJwtTokenService jwtTokenService,
         ICacheService cacheService,
         IPasswordHasherService passwordHasherService,
         IRepositoryBase<AppUser, Guid> userRepository,
-        IEncryptService encryptService,
-        ApplicationDbContext dbContext)
+        IRSAKeyGenerator encryptService)
     {
         _jwtTokenService = jwtTokenService;
         _cacheService = cacheService;
         _passwordHasherService = passwordHasherService;
         _userRepository = userRepository;
         _encryptService = encryptService;
-        _dbContext = dbContext;
     }
 
     public async Task<Result<Response.Authenticated>> Handle(Query.GetLoginQuery request, CancellationToken cancellationToken)
     {
-        // Get User by Email
+        // Step 01: Get User by Email
         var user = await _userRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken)
             ?? throw new AppUserException.UserNotFoundByEmailException(request.Email);
 
@@ -57,18 +54,11 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
             new (ClaimTypes.Email, user.Email),
         };
 
-        // Step 04: Handle Asymetric encryption
-        /*
-         * PrivateKey => Generate Access Token - Correct
-         * PrivateKey => Generate Access Token => Error => Correct
-         * PublicKet => Verify Access Token - Correct
-         *
-         * Problem:
-         * PrivateKey => Verify Access Token => Error
-         */
-        var keyPair = _encryptService.GenerateRsaKeyPair();
+        // Step 04: Generate key pair RSA
+        var rsaKeys = _encryptService.GenerateRsaKeyPair();
 
-        string accessToken = _jwtTokenService.GenerateAccessToken(claims, keyPair.privateKey);
+        // Step 05: Generate token && Create result
+        string accessToken = _jwtTokenService.GenerateAccessToken(claims, rsaKeys.privateKey);
         string refreshToken = _jwtTokenService.GenerateRefreshToken();
 
         var result = new Response.Authenticated
@@ -78,7 +68,16 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
             RefreshTokenExpiryTime = DateTime.Now.AddMinutes(5)
         };
 
-        await _cacheService.SetAsync(request.Email, result, cancellationToken);
+        // Step 06: Set AuthenticatedValue to Redis - Key Value
+        var authValue = new RedisKeyValue.AuthenticatedValue
+        {
+            AccessToken = result.AccessToken,
+            RefreshToken = result.RefreshToken,
+            RefreshTokenExpiryTime = result.RefreshTokenExpiryTime,
+            PublicKey = rsaKeys.publicKey
+        };
+
+        await _cacheService.SetAsync(request.Email, authValue, cancellationToken);
 
         return Result.Success(result);
     }

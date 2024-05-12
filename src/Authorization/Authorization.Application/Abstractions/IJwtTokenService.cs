@@ -1,13 +1,14 @@
 ﻿using System.Security.Claims;
-using System.Security.Cryptography;
 
 namespace Authorization.Application.Abstractions;
 
 public interface IJwtTokenService
 {
-    string GenerateAccessToken(IEnumerable<Claim> claims, RSAParameters privateKey);
+    string GenerateAccessToken(IEnumerable<Claim> claims, string privateKey);
 
     string GenerateRefreshToken();
 
-    ClaimsPrincipal GetPrincipalFromExpiredToken(string token, RSAParameters publicKey);
+    ClaimsPrincipal GetPrincipalFromExpiredToken(string token, string publicKey);
+
+    //JwtSecurityToken ValidateToken(string token);
 }
