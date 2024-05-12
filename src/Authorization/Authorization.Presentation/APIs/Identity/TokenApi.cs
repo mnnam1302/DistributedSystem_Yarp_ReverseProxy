@@ -1,7 +1,6 @@
 ﻿using Authorization.Presentation.Abstractions;
 using Carter;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,11 +28,12 @@ public class TokenApi : ApiEndpoint, ICarterModule
     private static async Task<IResult> RefreshTokenV1(ISender sender, HttpContext httpContext, [FromBody] DistributedSystem.Contract.Services.V1.Identity.Query.TokenQuery token)
     {
         //var accessToken = await httpContext.GetTokenAsync("access_token");
-
-        var result = await sender.Send(new DistributedSystem.Contract.Services.V1.Identity.Query.TokenQuery(token.AccessToken, token.RefreshToken));
+        var result = await sender.Send(new DistributedSystem.Contract.Services.V1.Identity.Query.TokenQuery(token.Email, token.AccessToken, token.RefreshToken));
 
         if (result.IsFailure)
+        {
             return HandlerFailure(result);
+        }
 
         return Results.Ok(result);
     }
@@ -43,7 +43,9 @@ public class TokenApi : ApiEndpoint, ICarterModule
         var result = await sender.Send(accessToken);
 
         if (result.IsFailure)
+        {
             return HandlerFailure(result);
+        }
 
         return Results.Ok(result);
     }

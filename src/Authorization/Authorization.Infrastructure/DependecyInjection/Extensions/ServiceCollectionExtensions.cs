@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IJwtTokenService, JwtTokenService>();
         services.AddTransient<ICacheService, CacheService>();
         services.AddTransient<IPasswordHasherService, PasswordHasherService>();
-        services.AddTransient<IEncryptService, EncryptService>();
+        services.AddTransient<IRSAKeyGenerator, RSAKeyGenerator>();
     }
 
     public static void AddRedisInfrastructure(this IServiceCollection services, IConfiguration configuration)
