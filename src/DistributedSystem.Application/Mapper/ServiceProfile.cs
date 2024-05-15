@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DistributedSystem.Contract.Abstractions.Shared;
+using DistributedSystem.Contract.Abstractions.Paging;
 using DistributedSystem.Contract.Services.V1.Product;
 using DistributedSystem.Domain.Entities;
 

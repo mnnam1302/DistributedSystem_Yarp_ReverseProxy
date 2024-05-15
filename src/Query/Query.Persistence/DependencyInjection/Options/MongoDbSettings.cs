@@ -1,6 +1,6 @@
 ﻿using Query.Domain.Abstractions.Options;
 
-namespace Query.Infrastructure.DependencyInjection.Options;
+namespace Query.Persistence.DependencyInjection.Options;
 
 public class MongoDbSettings : IMongoDbSettings
 {

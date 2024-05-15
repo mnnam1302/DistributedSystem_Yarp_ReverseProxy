@@ -44,11 +44,11 @@ builder.Host.ConfigureServices((context, servies) =>
         });
 
     builder.Services.AddMediatRApplication();
+    builder.Services.AddAutoMapperApplication();
 
-    builder.Services.AddServicesInfrastructure(context.Configuration);
     builder.Services.AddMasstransitRabbitMQInfrastructure(context.Configuration);
 
-    builder.Services.AddServicesPersistence();
+    builder.Services.AddServicesPersistence(context.Configuration);
 
     builder.Services.AddOpenTelemetryInfrastructure(context.Configuration);
 

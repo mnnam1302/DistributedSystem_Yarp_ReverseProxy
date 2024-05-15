@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Folder Include="Behaviors\" />
-    <Folder Include="UseCases\V1\Queries\Identity\" />
   </ItemGroup>
 
   <ItemGroup>
