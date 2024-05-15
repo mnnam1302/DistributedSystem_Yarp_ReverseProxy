@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using DistributedSystem.Contract.Abstractions.Paging;
 using MongoDB.Driver.Linq;
 using Query.Domain.Abstractions.Entities;
 

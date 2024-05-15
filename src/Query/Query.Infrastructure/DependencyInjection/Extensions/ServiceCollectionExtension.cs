@@ -15,15 +15,6 @@ namespace Query.Infrastructure.DependencyInjection.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static void AddServicesInfrastructure(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<MongoDbSettings>(
-            configuration.GetSection(nameof(MongoDbSettings)));
-
-        services.AddSingleton<IMongoDbSettings>(serviceProvider =>
-            serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value);
-    }
-
     public static IServiceCollection AddMasstransitRabbitMQInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var massTransitConfiguration = new MasstransitConfiguration();

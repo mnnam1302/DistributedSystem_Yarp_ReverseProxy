@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using DistributedSystem.Contract.Abstractions.Paging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -6,6 +7,7 @@ using Query.Domain.Abstractions.Entities;
 using Query.Domain.Abstractions.Options;
 using Query.Domain.Abstractions.Repositories;
 using Query.Domain.Attributes;
+using Query.Persistence.Abstractions;
 
 namespace Query.Persistence.Repositories;
 
@@ -14,18 +16,22 @@ public class MongoRepository<TDocument> : IMongoRepository<TDocument>
 {
     private readonly IMongoCollection<TDocument> _collection;
 
-    public MongoRepository(IMongoDbSettings settings)
-    {
-        var database = new MongoClient(settings.ConnectionString).GetDatabase(settings.DatabaseName);
-        _collection = database.GetCollection<TDocument>(GetCollectionName(typeof(TDocument)));
-    }
+    // Refactor code by creating IMongoDbContext, ProjectionDbContext
+    //public MongoRepository(IMongoDbSettings settings)
+    //{
+    //    var database = new MongoClient(settings.ConnectionString).GetDatabase(settings.DatabaseName);
+    //    _collection = database.GetCollection<TDocument>(GetCollectionName(typeof(TDocument)));
+    //}
 
-    protected string GetCollectionName(Type documentType)
+    //protected string GetCollectionName(Type documentType)
+    //{
+    //    return ((BsonCollectionAttribute)documentType.GetCustomAttributes(typeof(BsonCollectionAttribute), true)
+    //        .FirstOrDefault())?.CollectionName;
+    //}
+
+    public MongoRepository(IMongoDbContext context)
     {
-        return ((BsonCollectionAttribute)documentType.GetCustomAttributes(
-                typeof(BsonCollectionAttribute),
-                true)
-            .FirstOrDefault())?.CollectionName;
+        _collection = context.GetCollection<TDocument>();
     }
 
     public virtual IMongoQueryable<TDocument> AsQueryable(Expression<Func<TDocument, bool>>? filterExpression = null)

@@ -1,4 +1,5 @@
-﻿using DistributedSystem.Contract.Abstractions.Message;
+﻿using AutoMapper;
+using DistributedSystem.Contract.Abstractions.Message;
 using DistributedSystem.Contract.Abstractions.Shared;
 using DistributedSystem.Contract.Services.V1.Product;
 using Query.Domain.Abstractions.Repositories;
@@ -11,13 +12,15 @@ public sealed class GetProductByIdHandler : IQueryHandler<DistributedSystem.Cont
                Response.ProductResponse>
 {
     private readonly IMongoRepository<ProductProjection> _productRepository;
+    private readonly IMapper _mapper;
 
-    public GetProductByIdHandler(IMongoRepository<ProductProjection> productRepository)
+    public GetProductByIdHandler(IMongoRepository<ProductProjection> productRepository, IMapper mapper)
     {
         _productRepository = productRepository;
+        _mapper = mapper;
     }
 
-    public async Task<DistributedSystem.Contract.Abstractions.Shared.Result<Response.ProductResponse>> Handle(DistributedSystem.Contract.Services.V1.Product.Query.GetProductByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<Response.ProductResponse>> Handle(DistributedSystem.Contract.Services.V1.Product.Query.GetProductByIdQuery request, CancellationToken cancellationToken)
     {
         var product = await _productRepository.FindOneAsync(p => p.DocumentId == request.Id)
            ?? throw new ProductException.ProductNotFoundException(request.Id);
@@ -27,6 +30,8 @@ public sealed class GetProductByIdHandler : IQueryHandler<DistributedSystem.Cont
 
         var result = new Response.ProductResponse(product.DocumentId, product.Name, product.Price, product.Description);
 
+        // Củ chuối
+        //var result = _mapper.Map<Response.ProductResponse>(product);
         return Result.Success(result);
     }
 }
