@@ -1,7 +1,7 @@
 ﻿using Authorization.Application.Abstractions;
 using Authorization.Domain.Abstractions.Repositories;
-using Authorization.Domain.DomainErrors;
 using Authorization.Domain.Entities;
+using Authorization.Domain.Exceptions;
 using DistributedSystem.Contract.Abstractions.Message;
 using DistributedSystem.Contract.Abstractions.Shared;
 using DistributedSystem.Contract.Services.V1.Identity;
@@ -23,20 +23,28 @@ public class RegisterUserCommandHandler : ICommandHandler<Command.RegisterUserCo
 
     public async Task<Result> Handle(Command.RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        var isExistsUser = await _userRepository.FindSingleAsync(x => x.Email.Equals(request.Email), cancellationToken);
+        /*
+            1. Check if user exists
+            2. Hash password
+            3. Create user
+            4. Add user to database
+         */
 
-        // Should be thrown here, or use Result.Failure(Error)
+        // 1.
+        var isExistsUser = await _userRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken);
+
         if (isExistsUser is not null)
         {
-            //throw new IdentityException.UserExistsException("The user with email has already exists.");
-            return Result.Failure(UserErrors.EmailAlreadyInUse(request.Email));
+            throw new AppUserException.UserAlreadyExistsException(request.Email);
         }
 
-        var passwordSalt = _passwordHasherService.GenerateSalt();
-        var passwordHash = _passwordHasherService.HashPassword(request.Password, passwordSalt);
+        // 2.
+        var hashPassword = _passwordHasherService.HashPassword(request.Password);
 
-        var user = AppUser.Create(Guid.NewGuid(), request.FirstName, request.LastName, request.DateOfBirth, request.PhoneNumber, request.Email, passwordHash, passwordSalt);
+        // 3.
+        var user = AppUser.Create(Guid.NewGuid(), request.FirstName, request.LastName, request.DateOfBirth, request.PhoneNumber, request.Email, hashPassword);
 
+        // 4.
         _userRepository.Add(user);
 
         return Result.Success();

@@ -22,7 +22,9 @@ public static class JwtExtensions
 
             options.SaveToken = true; // Save token into AuthenticationProperties
 
-            var Key = Encoding.UTF8.GetBytes(jwtOptions.SecretKey);
+            // Have to get Email from token
+            // Get AuthValue from redis to get PublicKey to verify token
+            var key = Encoding.UTF8.GetBytes(jwtOptions.SecretKey);
             options.TokenValidationParameters = new TokenValidationParameters()
             {
                 ValidateIssuer = true,
@@ -31,7 +33,7 @@ public static class JwtExtensions
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = jwtOptions.Issuer,
                 ValidAudience = jwtOptions.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Key),
+                IssuerSigningKey = new SymmetricSecurityKey(key),
                 ClockSkew = TimeSpan.Zero,
             };
 

@@ -5,8 +5,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// Addd Serilog
+// Add Serilog
 Log.Logger = new LoggerConfiguration().ReadFrom
     .Configuration(builder.Configuration)
     .Enrich.WithProperty("Application", "ApiGateway")
@@ -38,8 +37,7 @@ builder.Host.ConfigureServices((context, services) =>
         // Add OpenTelemetry
         builder.Services.AddOpenTelemetryInfrastructure(context.Configuration);
 
-        services.AddHttpLogging(options 
-            => options.LoggingFields = HttpLoggingFields.All);
+        services.AddHttpLogging(options => options.LoggingFields = HttpLoggingFields.All);
     });
 });
 
@@ -50,7 +48,7 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseRateLimiter();
+app.UseRateLimiter();
 
 //app.MapReverseProxy();
 //app.MapReverseProxy().RequireRateLimiting(RateLimitExtensions.PerUserRateLimit);

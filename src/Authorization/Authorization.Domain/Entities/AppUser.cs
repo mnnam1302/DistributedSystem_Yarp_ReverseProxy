@@ -24,8 +24,6 @@ public class AppUser : IdentityUser<Guid>, IEntity<Guid>
 
     public int IsReceipient { get; set; }
 
-    public string PasswordSalt { get; set; }
-
     public virtual ICollection<IdentityUserClaim<Guid>> Claims { get; set; }
 
     public virtual ICollection<IdentityUserLogin<Guid>> Logins { get; set; }
@@ -34,7 +32,7 @@ public class AppUser : IdentityUser<Guid>, IEntity<Guid>
 
     public virtual ICollection<IdentityUserRole<Guid>> UserRoles { get; set; }
 
-    protected AppUser(Guid id, string firstName, string lastName, string fullName, DateTime? dateOfBirth, string? phoneNumber, string email, string passwordHash, string passwordSalt)
+    protected AppUser(Guid id, string firstName, string lastName, string fullName, DateTime? dateOfBirth, string? phoneNumber, string email, string passwordHash)
     {
         Id = id;
         FirstName = firstName;
@@ -44,10 +42,9 @@ public class AppUser : IdentityUser<Guid>, IEntity<Guid>
         PhoneNumber = phoneNumber;
         Email = email;
         PasswordHash = passwordHash;
-        PasswordSalt = passwordSalt;
     }
 
-    public static AppUser Create(Guid id, string firstName, string lastName, DateTime? dateOfBirth, string? PhoneNumber, string email, string passwordHash, string passwordSalt)
+    public static AppUser Create(Guid id, string firstName, string lastName, DateTime? dateOfBirth, string? PhoneNumber, string email, string passwordHash)
     {
         if (firstName.Length > 10)
             throw new AppUserException.UserFieldException(nameof(FirstName));
@@ -63,7 +60,7 @@ public class AppUser : IdentityUser<Guid>, IEntity<Guid>
 
         string fullName = $"{firstName} {lastName}";
 
-        var user = new AppUser(id, firstName, lastName, fullName, dateOfBirth, PhoneNumber, email, passwordHash, passwordSalt);
+        var user = new AppUser(id, firstName, lastName, fullName, dateOfBirth, PhoneNumber, email, passwordHash);
 
         return user;
     }

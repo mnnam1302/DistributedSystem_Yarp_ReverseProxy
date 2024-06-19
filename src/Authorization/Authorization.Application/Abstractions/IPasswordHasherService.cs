@@ -10,4 +10,7 @@ public interface IPasswordHasherService
     string GenerateSalt();
 
     // Version 02
+    string HashPassword(string password);
+
+    bool VerifyPassword(string password, string passwordHashed);
 }
