@@ -8,12 +8,12 @@ namespace Authorization.Infrastructure.Encryption;
 public class RSAKeyGenerator : IRSAKeyGenerator
 {
     /// <summary>
-    /// Usage of this method var (publicKey, privateKey) = GenerateRsaKeyPair();
+    /// Usage of this method var (publicKey, privateKey) = GenerateRsaKeyPair()
     /// </summary>
     /// <returns></returns>
     public (string privateKey, string publicKey) GenerateRsaKeyPair()
     {
-        using (var rsa = new RSACryptoServiceProvider(2048))
+        using (var rsa = new RSACryptoServiceProvider(4096))
         {
             var publicKey = ExportPublicKey(rsa);
             var privateKey = ExportPrivateKey(rsa);

@@ -19,12 +19,6 @@ public class AuthApi : ApiEndpoint, ICarterModule
 
         group1.MapPost("login", AuthenticationV1);
         group1.MapPost("logout", LogoutV1);
-
-        //var group2 = app.NewVersionedApi("authentication")
-        //    .MapGroup(BaseUrl).HasApiVersion(2);
-
-        // group2.MapGet("login", () => "");
-        // group2.MapGet("logout", () => "");
     }
 
     private static async Task<IResult> AuthenticationV1(ISender sender, [FromBody] DistributedSystem.Contract.Services.V1.Identity.Query.GetLoginQuery login)
@@ -39,7 +33,7 @@ public class AuthApi : ApiEndpoint, ICarterModule
         return Results.Ok(result);
     }
 
-    private static async Task<IResult> LogoutV1(ISender sender, [FromBody] 
+    private static async Task<IResult> LogoutV1(ISender sender, [FromBody]
     DistributedSystem.Contract.Services.V1.Identity.Command.LogoutCommand logout)
     {
         var result = await sender.Send(logout);

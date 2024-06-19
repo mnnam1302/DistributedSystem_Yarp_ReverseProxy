@@ -48,4 +48,16 @@ public class PasswordHasherService : IPasswordHasherService
 
         return Convert.ToBase64String(saltBytes);
     }
+
+    // V2 //
+    public string HashPassword(string password)
+    {
+        string passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 10);
+        return passwordHash;
+    }
+
+    public bool VerifyPassword(string password, string passwordHashed)
+    {
+        return BCrypt.Net.BCrypt.EnhancedVerify(password, passwordHashed);
+    }
 }

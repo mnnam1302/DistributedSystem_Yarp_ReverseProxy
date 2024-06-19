@@ -23,33 +23,37 @@ public class TokenQueryHandler : IQueryHandler<Query.TokenQuery, Response.Authen
     public async Task<Result<Response.Authenticated>> Handle(Query.TokenQuery request, CancellationToken cancellationToken)
     {
         /*
-         * Nhận 3 thông tin: Email, AccessToken, RefreshToken
-         * Email: kiểm tra tồn tài không bằng cách Get Value Cache với Key là Email
-         * Access token m gửi tào lao => Tạo ra th mới là đi
-         * Refresh token xem có khớp với cache không
+            1. Get cache by email from Redis
+            2. Validate token user's request => verify token
+            3. Compare email from token with email from request
+            4. Check refresh token
+            5. Generate new token && Create result
+            6. Set AuthenticatedValue to Redis - Key Value
          */
 
-        var accessToken = request.AccessToken;
-        var refreshToken = request.RefreshToken;
-
-        // Step 01: Get Cache Value from Redis - Email
+        // 1.
         var authValue = await _cacheService.GetAsync<RedisKeyValue.AuthenticatedValue>(request.Email, cancellationToken)
             ?? throw new IdentityException.TokenException("Can not get value from Redis");
 
-        // Step 02: Get Principal from expired token - Access Token
-        var principals = _jwtTokenService.GetPrincipalFromExpiredToken(accessToken, authValue.PublicKey);
+        // 2.
+        var principals = _jwtTokenService.GetPrincipalFromExpiredToken(request.AccessToken, authValue.PublicKey);
         var emailKey = principals.FindFirstValue(ClaimTypes.Email).ToString();
 
-        // Step 03: Check Refresh Token
-        if (authValue.RefreshToken != refreshToken || authValue.RefreshTokenExpiryTime <= DateTime.Now)
+        // 3.
+        if (emailKey != request.Email)
+        {
+            throw new IdentityException.TokenException("Email from token is not match with email from request");
+        }
+
+        // 4.
+        if (authValue.RefreshToken != request.RefreshToken || authValue.RefreshTokenExpiryTime <= DateTime.Now)
         {
             throw new IdentityException.TokenException("Request token invalid!");
         }
 
-        // Step 04: Generate new key pair
+        // 5.
         var rsaKeys = _rsaKeyGenerator.GenerateRsaKeyPair();
 
-        // Step 05: Generate new tokens
         var newAccessToken = _jwtTokenService.GenerateAccessToken(principals.Claims, rsaKeys.privateKey);
         var newRefreshToken = _jwtTokenService.GenerateRefreshToken();
 

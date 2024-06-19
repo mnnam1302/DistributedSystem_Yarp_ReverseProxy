@@ -34,19 +34,28 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
 
     public async Task<Result<Response.Authenticated>> Handle(Query.GetLoginQuery request, CancellationToken cancellationToken)
     {
-        // Step 01: Get User by Email
+        /*
+            1. Get User by Email
+            2. Verify password
+            3. Get user claims
+            4. Generate key pair RSA
+            5. Generate token && Create result
+            6. Set AuthenticatedValue to Redis - Key Value
+         */
+
+        // 1.
         var user = await _userRepository.FindSingleAsync(x => x.Email == request.Email, cancellationToken)
             ?? throw new AppUserException.UserNotFoundByEmailException(request.Email);
 
-        // Step 02: Verify password
-        var isAuthentication = _passwordHasherService.VerifyPassword(request.Password, user.PasswordHash!, user.PasswordSalt);
+        // 2.
+        var isMatch = _passwordHasherService.VerifyPassword(request.Password, user.PasswordHash);
 
-        if (!isAuthentication)
+        if (!isMatch)
         {
             throw new IdentityException.AuthenticatedException();
         }
 
-        // Step 03: Get user claims
+        // 3.
         var claims = new List<Claim>
         {
             new (ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -54,10 +63,10 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
             new (ClaimTypes.Email, user.Email),
         };
 
-        // Step 04: Generate key pair RSA
+        // 4.
         var rsaKeys = _encryptService.GenerateRsaKeyPair();
 
-        // Step 05: Generate token && Create result
+        // 5.
         string accessToken = _jwtTokenService.GenerateAccessToken(claims, rsaKeys.privateKey);
         string refreshToken = _jwtTokenService.GenerateRefreshToken();
 
@@ -68,7 +77,7 @@ public class GetLoginQueryHandler : IQueryHandler<Query.GetLoginQuery, Response.
             RefreshTokenExpiryTime = DateTime.Now.AddMinutes(5)
         };
 
-        // Step 06: Set AuthenticatedValue to Redis - Key Value
+        // 6.
         var authValue = new RedisKeyValue.AuthenticatedValue
         {
             AccessToken = result.AccessToken,
